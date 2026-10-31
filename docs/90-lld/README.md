@@ -2,8 +2,10 @@
 
 **Status:** Reviewed design baseline, not implemented. **MVP goal:** best defensible next action and time for Polish vineyard/cellar conditions with minimal fixed and token spend; quality is measured, not assumed.
 
+Read the short [Business HLD](../10-architecture/business-hld.md) first. The independent [architecture review](../70-quality/architecture-review-2026-11.md) concludes that the eight-module structure should be retained, with concrete Wave 0 implementation prerequisites. **Implementation-ready means design guidance, not compiled ports or verified database migrations.**
+
 ## Required reading/order
-1. [Architecture guardrails](../00-governance/architecture-guardrails.md) and [approved bounded contexts](../20-domains/context-map.md).
+1. [Business HLD](../10-architecture/business-hld.md), [architecture review](../70-quality/architecture-review-2026-11.md), [Architecture guardrails](../00-governance/architecture-guardrails.md) and [approved bounded contexts](../20-domains/context-map.md).
 2. [Data model](data-and-transactions.md) and [reference PostgreSQL DDL](../50-data/sql/001_foundation.sql).
 3. [Ports and contracts](ports-and-compatibility.md), [processing and prediction](incremental-prediction.md).
 4. [Decision planning](agents-and-decisions.md), [retrieval](knowledge-and-retrieval.md), [ingestion](source-adapters.md).

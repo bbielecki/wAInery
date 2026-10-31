@@ -196,27 +196,38 @@ CREATE TABLE knowledge.index_publications (
   published_at timestamptz NOT NULL DEFAULT now(), status text NOT NULL CHECK(status IN ('ACTIVE','RETIRED')),
   UNIQUE(workspace_id,index_version)
 );
+-- Prediction definition rows are immutable once used: publish a new (code,version),
+-- do not UPDATE old definitions. Application/review migration tests must enforce this policy.
 CREATE TABLE decisions.prediction_definitions (
-  code text PRIMARY KEY, version text NOT NULL, model_kind text NOT NULL,
+  code text NOT NULL, version text NOT NULL, model_kind text NOT NULL,
   input_dependencies jsonb NOT NULL, materiality_policy jsonb NOT NULL,
-  output_contract text NOT NULL, active boolean NOT NULL DEFAULT true
+  output_contract text NOT NULL, active boolean NOT NULL DEFAULT true,
+  PRIMARY KEY(code,version)
 );
+CREATE UNIQUE INDEX prediction_one_active_definition_idx
+  ON decisions.prediction_definitions(code) WHERE active;
 CREATE TABLE decisions.prediction_states (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(), workspace_id uuid NOT NULL REFERENCES registry.workspaces(id),
-  prediction_code text NOT NULL REFERENCES decisions.prediction_definitions(code),
+  prediction_code text NOT NULL, prediction_definition_version text NOT NULL,
   subject_module text NOT NULL, subject_kind text NOT NULL, subject_id uuid NOT NULL,
   horizon_start timestamptz NOT NULL, horizon_end timestamptz NOT NULL,
   status text NOT NULL CHECK(status IN ('CURRENT','STALE','RECOMPUTING','FAILED','INSUFFICIENT_DATA')),
   input_revision bigint NOT NULL DEFAULT 0, published_revision bigint NOT NULL DEFAULT 0,
   last_run_at timestamptz, valid_until timestamptz, last_result jsonb,
-  UNIQUE(workspace_id,prediction_code,subject_module,subject_kind,subject_id,horizon_start,horizon_end),
+  FOREIGN KEY(prediction_code,prediction_definition_version)
+    REFERENCES decisions.prediction_definitions(code,version),
+  UNIQUE(workspace_id,prediction_code,prediction_definition_version,subject_module,subject_kind,subject_id,horizon_start,horizon_end),
+  UNIQUE(id,prediction_definition_version),
   CHECK(horizon_end>horizon_start)
 );
 CREATE TABLE decisions.prediction_runs (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), prediction_state_id uuid NOT NULL REFERENCES decisions.prediction_states(id),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), prediction_state_id uuid NOT NULL,
+  prediction_definition_version text NOT NULL,
   requested_revision bigint NOT NULL, started_at timestamptz NOT NULL,
   finished_at timestamptz, status text NOT NULL, input_manifest jsonb NOT NULL,
-  model_version text, probability_metadata jsonb, outcome jsonb, error_code text
+  model_version text, probability_metadata jsonb, outcome jsonb, error_code text,
+  FOREIGN KEY(prediction_state_id,prediction_definition_version)
+    REFERENCES decisions.prediction_states(id,prediction_definition_version)
 );
 CREATE TABLE decisions.decision_plans (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(), workspace_id uuid NOT NULL REFERENCES registry.workspaces(id),

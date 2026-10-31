@@ -29,4 +29,4 @@ Owner contract + errors/idempotency + tests + migration + sample payload + cost/
 Vineyard/Winery experts are *domain processes* while `VineyardAdvisor`/`WinemakingAdvisor` belong to `AIExecution` (prompts/tool configuration). `Decisions` remains the only publisher of ranking/plan. New specialized advisor adds role/config and approved tools; does not require its own service or database.
 
 ## Traceability and acceptance
-Each feature/story points to a business requirement (`BR-01..06` in HLD), a contract, one module owner, relevant DDL table and an acceptance scenario. Independent reviewer checks this graph and records changes in review log. Do not claim functional MVP completed after only markdown or SQL files exist.
+Each feature/story points to a business requirement (`BR-01..10` in [traceability](../10-architecture/business-requirements-traceability.md)), a contract, one module owner, relevant DDL table and an acceptance scenario. Independent reviewer checks this graph and records changes in review log. Do not claim functional MVP completed after only markdown or SQL files exist.

@@ -1,15 +1,16 @@
 # Architectural review gates
 
-Status: **Gate 1 accepted**, **Gate 2 accepted** by the user (2026-10-31). Gate 3 component decomposition **accepted**; Gate 4 LLD in local review/commit process.
+**Current state (2026-11-01):** Gates 1–3 **accepted by product owner**. Gate 4 LLD **documented and architecturally reviewed**, but C# contracts and SQL migrations are **not yet compiled/executed**. Documentation extension PR #1 is pending on GitHub; this review is a stacked PR. Documentation publication is not evidence of a running MVP.
 
 | Gate | Approval object | State / exit criteria |
 |---|---|---|
 | 1 — Repository layout | Directories, documentation and agent ownership | **Accepted** |
-| 2 — Domain map | 8 contexts, owners, context map | **Accepted** — Decisions owns both predictions and action planning |
-| 3 — Components | Per-module subcomponents, public ports/event schema drafts, dependency DAG | **For review**; must preserve business/cost/security guardrails |
-| 4 — Full LLD | Exact schema, algorithms, class/API contracts, migrations, tests, ADRs | After Gate 3 approval; independent review and fixes |
-| 5 — Publication | GitHub private branch / PR | After verification of repository permissions and artifact inspection |
+| 2 — Domain map | 8 contexts, data owners, context map | **Accepted** — Decisions owns prediction and action ranking |
+| 3 — Components | Per-module components, public port proposals and dependency DAG | **Accepted** — no new service per component |
+| 4 — Design LLD | Logical schema, algorithms, contract sketches, risks and test strategy | **Reviewed, conditional** — close [architecture review findings](../70-quality/architecture-review-2026-11.md), freeze compiling DTOs, run actual migrations in Wave 0 |
+| 5 — Documentation publication | Versioned GitHub branches / PRs | **Main baseline published; PR #1 + stacked review awaiting human merge** |
+| 6 — Runnable MVP / business gate | Vertical journeys, test proof, accepted recommendations and measured cost | **Not started** — acceptance conditions in [evaluation protocol](../90-lld/evaluation-protocol.md) |
 
-Gate 3 user approval obtained. MVP is local, evaluation-first, with minimal running cost.
+Documentation gates and implementation gates are different. No architecture reviewer may claim the product is accurate, secure for public access, or fully resilient merely because the LLD is complete.
 
-GitHub bbielecki/wAInery was previously not visible to the connected GitHub account despite recognizing user `bbielecki`; no repository changes made.
+[Business HLD](../10-architecture/business-hld.md) | [Business traceability](../10-architecture/business-requirements-traceability.md) | [Implementation DAG](../80-delivery/implementation-dag.md).

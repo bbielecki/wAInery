@@ -1,6 +1,6 @@
 # Context map — Smart Winery AI
 
-Status: **Gate 2 accepted**. Domain decomposition; detailed components proposed for Gate 3.
+Status: **Gate 2 accepted**. Domain decomposition; Gate 3 component boundaries also accepted. LLD is reviewed with remaining Wave 0 implementation prerequisites.
 
 ## Context classification
 

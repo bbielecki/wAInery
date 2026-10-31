@@ -14,11 +14,14 @@ Status: **pre-implementation contract specification; signatures below are design
 
 No `Infrastructure` reference to a different module's `Infrastructure` or `Domain`. Cross-module calls through `Contracts` and explicit read ports; integration events through versioned envelope. Prevent direct EF navigation across module schemas.
 
+**Shared physical registry, exclusive logical owners:** `registry.workspaces` is an Integration/Bootstrap responsibility; `registry.sources` is writable only by Connectivity's application ports; `registry.measurement_types` only by Observations. A table sharing the `registry` schema is not a shared aggregate. The central `docs/50-data/sql/001_foundation.sql` is a **reference blueprint owned by Integration**, not a common edit target. Domain agents propose scoped migrations (or migration deltas) under their owned module/handoff directories and Integration sequences/validates the actual migrations. No agent modifies shared DDL concurrently.
+
+
 ## Common value objects (freeze in Wave 0)
 
 ```csharp
 public readonly record struct WorkspaceId(Guid Value);
-public sealed record SubjectRef(string Module, string Kind, string Id); // public opaque ID
+public sealed record SubjectRef(WorkspaceId Workspace, string Module, string Kind, string Id); // in-process scope + opaque public ID
 public sealed record EvidenceRef(string SourceId, string Version, string Locator);
 public sealed record TimeWindow(DateTimeOffset From, DateTimeOffset To); // half-open [from,to)
 public sealed record Quantity(decimal Value, string Unit, string? Method);
@@ -26,7 +29,7 @@ public sealed record DomainError(string Code, string Message, bool Retryable, st
 public sealed record Result<T>(T? Value, DomainError? Error);
 ```
 
-All public IDs remain **opaque strings**, though internal PostgreSQL IDs are UUID. Owner maps `(workspace,module,kind,externalId)` to internal UUID. No runtime `Guid.Parse` on a `SubjectRef.Id`. `TimeWindow` requires `To > From` and UTC persistence; timezone used only for display and interpretation of user input. Use decimal for domain measurements, not floating-point primary records.
+The wire JSON `subject` contains `module/kind/id` with `workspaceId` at the envelope/request root. In-process `SubjectRef.Workspace` must equal that outer workspace; validate equality at every boundary. The authoritative C# signature sketch is in [ports-and-compatibility.md](ports-and-compatibility.md); this document must not define a competing implementation. All public IDs remain **opaque strings**, though internal PostgreSQL IDs are UUID. Owner maps `(workspace,module,kind,externalId)` to internal UUID. No runtime `Guid.Parse` on a `SubjectRef.Id`. `TimeWindow` requires `To > From` and UTC persistence; timezone used only for display and interpretation of user input. Use decimal for domain measurements, not floating-point primary records.
 
 ## Public port matrix
 
