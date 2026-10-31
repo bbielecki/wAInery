@@ -6,4 +6,4 @@
 
 Seven module teams may implement concurrently **after** Wave 0 freezes compiled C# DTOs and running migrations. `Decisions` consumes read contracts of the other business modules; `AIExecution` implements the `Decisions` reasoning port behind Host DI, not by direct dependencies.
 
-Do not add microservices, internal cross-module EF references or generic shared domain entities just for modularity. The business objective remains high-quality next-action/time recommendations at minimal operating cost. See [monorepo bootstrap](../../../docs/80-delivery/monorepo-bootstrap.md) and [business HLD](../../../docs/10-architecture/business-hld.md).
+Do not add microservices, internal cross-module EF references or generic shared domain entities just for modularity. The business objective remains high-quality next-action/time recommendations at minimal operating cost. See [monorepo bootstrap](../../docs/80-delivery/monorepo-bootstrap.md) and [business HLD](../../docs/10-architecture/business-hld.md).
