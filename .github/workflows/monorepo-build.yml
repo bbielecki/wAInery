@@ -1,0 +1,25 @@
+name: Monorepo structural checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-boundaries:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Restore
+        run: dotnet restore wAInery.slnx
+      - name: Compile full solution
+        run: dotnet build wAInery.slnx --no-restore --configuration Release
+      - name: Validate module reference boundaries
+        run: dotnet run --project tests/Architecture/wAInery.ArchitectureChecks.csproj --no-restore --configuration Release

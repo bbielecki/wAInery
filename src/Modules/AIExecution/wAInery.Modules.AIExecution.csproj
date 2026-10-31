@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>wAInery.Modules.AIExecution</AssemblyName>
+    <RootNamespace>wAInery.Modules.AIExecution</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="Contracts/wAInery.Modules.AIExecution.Contracts.csproj" />
+    <ProjectReference Include="../../BuildingBlocks/wAInery.BuildingBlocks.csproj" />
+    <ProjectReference Include="../Decisions/Contracts/wAInery.Modules.Decisions.Contracts.csproj" />
+  </ItemGroup>
+</Project>

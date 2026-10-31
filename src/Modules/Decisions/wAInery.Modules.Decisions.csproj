@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>wAInery.Modules.Decisions</AssemblyName>
+    <RootNamespace>wAInery.Modules.Decisions</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="Contracts/wAInery.Modules.Decisions.Contracts.csproj" />
+    <ProjectReference Include="../../BuildingBlocks/wAInery.BuildingBlocks.csproj" />
+    <ProjectReference Include="../Vineyard/Contracts/wAInery.Modules.Vineyard.Contracts.csproj" />
+    <ProjectReference Include="../Winery/Contracts/wAInery.Modules.Winery.Contracts.csproj" />
+    <ProjectReference Include="../Observations/Contracts/wAInery.Modules.Observations.Contracts.csproj" />
+    <ProjectReference Include="../Weather/Contracts/wAInery.Modules.Weather.Contracts.csproj" />
+    <ProjectReference Include="../Knowledge/Contracts/wAInery.Modules.Knowledge.Contracts.csproj" />
+  </ItemGroup>
+</Project>

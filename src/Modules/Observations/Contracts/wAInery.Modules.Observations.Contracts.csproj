@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>wAInery.Modules.Observations.Contracts</AssemblyName>
+    <RootNamespace>wAInery.Modules.Observations.Contracts</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../../BuildingBlocks/wAInery.BuildingBlocks.csproj" />
+  </ItemGroup>
+</Project>

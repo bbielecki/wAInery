@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>wAInery.Modules.Winery</AssemblyName>
+    <RootNamespace>wAInery.Modules.Winery</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="Contracts/wAInery.Modules.Winery.Contracts.csproj" />
+    <ProjectReference Include="../../BuildingBlocks/wAInery.BuildingBlocks.csproj" />
+  </ItemGroup>
+</Project>

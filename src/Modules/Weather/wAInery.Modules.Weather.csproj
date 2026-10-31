@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>wAInery.Modules.Weather</AssemblyName>
+    <RootNamespace>wAInery.Modules.Weather</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="Contracts/wAInery.Modules.Weather.Contracts.csproj" />
+    <ProjectReference Include="../../BuildingBlocks/wAInery.BuildingBlocks.csproj" />
+  </ItemGroup>
+</Project>

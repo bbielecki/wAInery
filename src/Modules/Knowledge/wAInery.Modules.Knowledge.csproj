@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>wAInery.Modules.Knowledge</AssemblyName>
+    <RootNamespace>wAInery.Modules.Knowledge</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="Contracts/wAInery.Modules.Knowledge.Contracts.csproj" />
+    <ProjectReference Include="../../BuildingBlocks/wAInery.BuildingBlocks.csproj" />
+  </ItemGroup>
+</Project>

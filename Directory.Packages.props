@@ -1,0 +1,6 @@
+<Project>
+  <!-- All future NuGet package versions are pinned here by Integration Owner in Wave 0. -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+</Project>

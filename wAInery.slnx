@@ -1,0 +1,29 @@
+<Solution>
+  <Folder Name="/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/wAInery.BuildingBlocks.csproj" />
+  </Folder>
+  <Folder Name="/Host/">
+    <Project Path="src/Host/wAInery.Host.csproj" />
+  </Folder>
+  <Folder Name="/Modules/">
+    <Project Path="src/Modules/Vineyard/Contracts/wAInery.Modules.Vineyard.Contracts.csproj" />
+    <Project Path="src/Modules/Vineyard/wAInery.Modules.Vineyard.csproj" />
+    <Project Path="src/Modules/Winery/Contracts/wAInery.Modules.Winery.Contracts.csproj" />
+    <Project Path="src/Modules/Winery/wAInery.Modules.Winery.csproj" />
+    <Project Path="src/Modules/Decisions/Contracts/wAInery.Modules.Decisions.Contracts.csproj" />
+    <Project Path="src/Modules/Decisions/wAInery.Modules.Decisions.csproj" />
+    <Project Path="src/Modules/Observations/Contracts/wAInery.Modules.Observations.Contracts.csproj" />
+    <Project Path="src/Modules/Observations/wAInery.Modules.Observations.csproj" />
+    <Project Path="src/Modules/Weather/Contracts/wAInery.Modules.Weather.Contracts.csproj" />
+    <Project Path="src/Modules/Weather/wAInery.Modules.Weather.csproj" />
+    <Project Path="src/Modules/Knowledge/Contracts/wAInery.Modules.Knowledge.Contracts.csproj" />
+    <Project Path="src/Modules/Knowledge/wAInery.Modules.Knowledge.csproj" />
+    <Project Path="src/Modules/Connectivity/Contracts/wAInery.Modules.Connectivity.Contracts.csproj" />
+    <Project Path="src/Modules/Connectivity/wAInery.Modules.Connectivity.csproj" />
+    <Project Path="src/Modules/AIExecution/Contracts/wAInery.Modules.AIExecution.Contracts.csproj" />
+    <Project Path="src/Modules/AIExecution/wAInery.Modules.AIExecution.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="tests/Architecture/wAInery.ArchitectureChecks.csproj" />
+  </Folder>
+</Solution>

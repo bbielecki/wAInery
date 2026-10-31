@@ -40,3 +40,8 @@ flowchart TD
 ## Completion criteria for each package
 
 README scope, interface/DTO with version, consumer example, failure & idempotency semantics, migration, tests, measured cost impact, no secrets/protected contents, and handoff note. This gate documents **what** to build; Gate 4 finalizes **how**, including all DB DDL, class diagrams, algorithms, edge-case tests and provider adapters.
+
+
+## Implementation scaffold available
+
+A `wAInery.slnx` .NET 10 solution, loopback-only Host, eight module Contracts + implementation project pairs, ArchitectureChecks and local PostgreSQL Compose are now present on the monorepo bootstrap branch. This **does not complete Wave 0**: the business ports still require compiling DTO implementations, actual database migration tests and durable workflows. See [monorepo bootstrap](monorepo-bootstrap.md).
