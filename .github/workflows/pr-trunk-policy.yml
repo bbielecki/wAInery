@@ -1,0 +1,44 @@
+name: PR rebased on main
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+
+permissions:
+  contents: read
+
+jobs:
+  up-to-date:
+    name: PR rebased on main
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.base.ref == 'main'
+    steps:
+      - name: Checkout PR head (not GitHub's synthetic merge commit)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Require current main to be ancestor of PR head
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin '+refs/heads/main:refs/remotes/origin/main'
+          MAIN="$(git rev-parse refs/remotes/origin/main)"
+          HEAD="$(git rev-parse HEAD)"
+          echo "main: ${MAIN}"
+          echo "PR head: ${HEAD}"
+          if ! git merge-base --is-ancestor "${MAIN}" "${HEAD}"; then
+            echo "::error::PR branch is behind main. git fetch origin && git rebase origin/main; push only your branch with --force-with-lease; rerun all checks."
+            exit 1
+          fi
+          echo "PASS: PR contains latest main."
+      - name: Warn on unusually broad PR
+        shell: bash
+        run: |
+          set -euo pipefail
+          N="$(git rev-list --count refs/remotes/origin/main..HEAD)"
+          echo "PR contains ${N} commits (will squash to one commit on trunk)."
+          if [ "${N}" -gt 12 ]; then
+            echo "::warning::Large/long-lived PR: consider splitting into smaller, independently testable increments."
+          fi

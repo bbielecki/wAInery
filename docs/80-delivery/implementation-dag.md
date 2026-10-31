@@ -51,3 +51,7 @@ A `wAInery.slnx` .NET 10 solution, loopback-only Host, eight module Contracts + 
 The eight modules are **bounded code/data owners, not eight teams that must run in parallel**. For the cost-constrained MVP, schedule four workstreams: Domain State (Vineyard+Winery), Data Acquisition (Connectivity+Observations+Weather), Knowledge & AI (Knowledge+AIExecution), and Decisions; one Integration Owner owns shared Contracts, Host, CI and migration assembly. Start with 1–2 active coding sessions, worktrees and narrow PRs, plus independent QA. This refines the Wave 1 parallel graph without changing bounded-context ownership.
 
 Read [team topology](../00-governance/agent-team-topology.md), [full SDLC](agentic-sdlc.md), [test strategy](../70-quality/implementation-test-strategy.md) and [Codex workflow](codex-development-workflow.md). Wave 0 remains incomplete until actual public contracts compile and PostgreSQL migration/replay tests run.
+
+## Merge and branch lifetime
+
+Mandatory [trunk-based collaboration policy](../00-governance/trunk-based-collaboration.md): all work lands on **`main`**, no long-lived integration branch, one small feature per branch/worktree, rebase on latest `origin/main` before merge, rerun tests, independent review, default squash merge, cleanup remote branch and local worktree after confirmed merge. Parallelism is limited by stable contracts and exclusive path ownership, not by keeping branches alive.

@@ -36,6 +36,14 @@
 - **Private data, books, secrets and unauthorized egress:** Confirm not committed/transmitted.
 - **Known limitations and follow-up work:**
 
+## Trunk-based branch hygiene (required before merge)
+
+- [ ] This is **one small, independently testable feature/fix** on a short-lived branch targeting `main` (explain exceptions).
+- [ ] I ran `git fetch origin && git rebase origin/main` on this task branch **after the last relevant main change**; no unrelated commits or merge commits remain.
+- [ ] All required tests/CI reran **after** that rebase and passed at the final head.
+- [ ] Feature will be **squash-merged** to `main` (or documented independent-commit exception) and the remote branch/local worktree will be removed after integration.
+- [ ] No permanent integration branch, no direct or force push to `main`.
+
 ## Review and merge decision
 
 - [ ] Implementer self-review completed
@@ -44,4 +52,4 @@
 - [ ] CI checks are green (not merely described as green)
 - [ ] Human Product Owner consulted when changing domain safety/budget/acceptance expectations
 
-Do **not** merge on unresolved P0/P1 findings, cross-module contract incompatibility or failed required checks. See [agent-assisted SDLC](../docs/80-delivery/agentic-sdlc.md).
+Do **not** merge on unresolved P0/P1 findings, cross-module contract incompatibility, failed required checks or a branch behind current `main`. See [trunk policy](../docs/00-governance/trunk-based-collaboration.md). See [agent-assisted SDLC](../docs/80-delivery/agentic-sdlc.md).

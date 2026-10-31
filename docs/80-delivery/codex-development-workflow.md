@@ -59,7 +59,7 @@ Replace paths/ticket with the actual approved assignment. Make the test cases an
 - Each task uses a short feature branch based on up-to-date `main`. One behavior/module per PR. Codex may prepare the PR and test report, but a separate reviewer checks the diff, fixtures, contract/data consistency and new model spend.
 - CI required: restore/build, project boundaries, and, once implemented, domain unit tests, contract fixtures and actual PostgreSQL integration tests.
 - Shared files are Integration Owner single-writer; module agent files are path-scoped. Use small contract PRs before competing module PRs.
-- Keep PRs reviewable. Record commands **actually executed** and failures; do not treat generated "tests passed" prose as evidence.
+- Use **trunk-based development with one short-lived branch per small behavior**, not a long-lived module or team branch; **squash merge to `main` after rebase and updated CI**, then delete the remote branch and local worktree. Keep PRs reviewable. Record commands **actually executed** and failures; do not treat generated "tests passed" prose as evidence.
 - Prefer integrating one vertical business journey early rather than completing all modules and finding integration gaps late.
 
 ## Optional Codex Cloud
@@ -87,3 +87,5 @@ Cloud task availability and execution limits are account/workspace-dependent. Th
 - [Codex Cloud tasks](https://help.openai.com/en/articles/20001545-using-codex-cloud)
 - [Codex workflow conventions and AGENTS.md](https://developers.openai.com/cookbook/examples/codex/iterating-development-workflows-with-codex)
 - [Codex harness / CLI exec / SDK](https://developers.openai.com/blog/codex-as-a-platform)
+
+The authoritative [trunk-based workflow](../00-governance/trunk-based-collaboration.md) controls mandatory branch lifetime, conflict handling, merge order, CI check, cleanup and GitHub ruleset requirements.

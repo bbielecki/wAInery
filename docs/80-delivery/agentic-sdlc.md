@@ -4,7 +4,7 @@ This is the **delivery procedure**, not an AI framework to add to the product. A
 
 ## Delivery model
 
-Use **trunk-based integration with short, task-scoped feature branches and GitHub PRs**. Protect `main` with required CI and review when repository settings permit. An implementation agent never force-pushes `main` or self-merges a failed check; credentials, source texts or real vineyard history never go to Git. No branch may assume the local machine is always running.
+Use **trunk-based development with short, task-scoped feature branches and GitHub PRs into `main`**. [Mandatory trunk policy](../00-governance/trunk-based-collaboration.md) requires explicit rebase on current `origin/main`, updated CI, squash merge and branch deletion. Protect `main` with required CI and review when repository settings permit. An implementation agent never force-pushes `main` or self-merges a failed check; credentials, source texts or real vineyard history never go to Git. No branch may assume the local machine is always running.
 
 A branch addresses one vertical user-observable change or one **well-bounded prerequisite**; avoid a PR implementing an entire bounded context before checking it in isolation. Approved interfaces and event schemas are contracts, not invitations to redesign the domain.
 
@@ -32,8 +32,8 @@ A branch addresses one vertical user-observable change or one **well-bounded pre
 4. Write a brief design/test plan in PR or `agents/handoffs/<ticket>.md`. If a public contract must change, stop feature code and submit integration-owned contract change first.
 5. Implement in small commits; run targeted tests every change and whole solution/architecture/contract suite before PR.
 6. Open PR with file diff, tests and failure paths, contract version, budget impact and exact LLM/online dependencies. Reviewer must independently examine PR, not rely solely on agent explanation.
-7. Rebase/merge latest `main` only as permitted; review/test every conflict. Integrator checks schema migration ordering and semantic compatibility before merge.
-8. After merge check the **whole** canonical workflow; record regression fixture when a bug is found. Remove temporary branches/worktrees after merge; retain handoff in Git.
+7. **Always** `git fetch origin && git rebase origin/main` before final review and merge; push rebased task branch with `--force-with-lease` if necessary, never force `main`. If main advances after CI, rebase again and rerun checks; review/test every conflict. Integrator checks schema migration ordering and semantic compatibility before merge.
+8. After **squash merge to `main`** check the **whole** canonical workflow; record regression fixture when a bug is found. Delete merged remote branches and remove local worktrees/branches; retain handoff in Git. No permanent `develop` or team integration branch.
 
 ## Branch and commit conventions
 

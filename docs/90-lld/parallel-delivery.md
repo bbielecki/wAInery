@@ -20,7 +20,7 @@
 **Wave 3** Integrator: End-to-end scenario path and migration runner; register module DI and configure local startup. **Wave 4** Independent QA + threat review + benchmark; fix findings via respective owner, merge with tests. Public cloud/IoT/UI separate future increments.
 
 ## Branch/commit policy
-Branch convention `agent/<module>/<scope>`; short commits (contract, persistence, features, tests), PR into integration branch after contract, architecture, integration validation. One agent per bounded folder. File ownership enforced by PR diff check. Shared contract changes proposed in `agents/handoffs`, reviewed and applied by Integration Owner as distinct commit. No cherry-pick of conflicting shared edits.
+Branch convention `agent/<module>/<scope>`; small commits on a short-lived feature branch (contract, persistence, features, tests); one coherent squash commit on trunk, PR directly into `main` **only after rebase onto latest `origin/main`**, required tests and independent review; **squash merge** by default and delete feature branch after merge. One agent per bounded folder. File ownership enforced by PR diff check. Shared contract changes proposed in `agents/handoffs`, reviewed and applied by Integration Owner as distinct commit. No cherry-pick of conflicting shared edits.
 
 ## Definition of Done for a module
 Owner contract + errors/idempotency + tests + migration + sample payload + cost/latency implications + audit/recovery semantics + handoff. Record input/output dependencies, public types, version and known limitations. No private content committed; no unreviewed changes to upstream module internals.
@@ -30,3 +30,5 @@ Vineyard/Winery experts are *domain processes* while `VineyardAdvisor`/`Winemaki
 
 ## Traceability and acceptance
 Each feature/story points to a business requirement (`BR-01..10` in [traceability](../10-architecture/business-requirements-traceability.md)), a contract, one module owner, relevant DDL table and an acceptance scenario. Independent reviewer checks this graph and records changes in review log. Do not claim functional MVP completed after only markdown or SQL files exist.
+
+See the [mandatory trunk policy](../00-governance/trunk-based-collaboration.md). Each agent must use its own worktree/branch; aim for one independently testable behavior in 1–2 working days. No branch-per-BC or permanent integration branch; no stale PR merge, no branch deletion before successful merge.
