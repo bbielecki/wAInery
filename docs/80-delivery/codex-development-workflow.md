@@ -41,7 +41,7 @@ Example task prompt:
 
 ```text
 Read AGENTS.md, docs/10-architecture/business-hld.md,
-docs/80-delivery/agentic-sdlc.md, docs/30-components/weather.md
+docs/80-delivery/agentic-sdlc.md, docs/30-components/Weather.md
 and the frozen Weather public contracts.
 Implement only ticket WX-001 (immutable forecast runs and as-of selection).
 Owned paths: src/Modules/Weather/** and tests/Modules/Weather/**.
