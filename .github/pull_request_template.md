@@ -44,6 +44,14 @@
 - [ ] Feature will be **squash-merged** to `main` (or documented independent-commit exception) and the remote branch/local worktree will be removed after integration.
 - [ ] No permanent integration branch, no direct or force push to `main`.
 
+## Engineering learning and cross-team reuse
+
+- **Relevant existing skill/lesson used (or none):**
+- **Verified transferable finding (test/PR evidence) or `No transferable finding`:**
+- **Downstream module owners notified and their response, if needed:**
+- **Recurring workflow suitable for a future skill (or none; architect decides):**
+- [ ] No secrets, real private book/operational data, raw prompts or unverified claims stored in knowledge/skill files.
+
 ## Review and merge decision
 
 - [ ] Implementer self-review completed
