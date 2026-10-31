@@ -1,6 +1,6 @@
 # Gate 3 — component map and module seams
 
-**Status: proposal for user review (Gate 3).** Gate 1 layout and Gate 2 domain boundaries are approved. This is **not** a frozen, build-ready full LLD or a completed implementation.
+**Status: Gate 3 approved.** Detailed design is now in `docs/90-lld/README.md`; this component document remains the approved ownership baseline, not an implementation.
 
 ## Deployment view (MVP)
 

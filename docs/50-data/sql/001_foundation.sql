@@ -3,6 +3,7 @@
 -- Run once using a dedicated migration owner; use EF migrations for later changes.
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE EXTENSION IF NOT EXISTS vector;
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
 CREATE SCHEMA IF NOT EXISTS registry;
 CREATE SCHEMA IF NOT EXISTS connectivity;
 CREATE SCHEMA IF NOT EXISTS vineyard;
@@ -133,7 +134,8 @@ CREATE TABLE weather.locations (
 );
 CREATE TABLE weather.forecast_runs (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(), workspace_id uuid NOT NULL,
-  location_id uuid NOT NULL, source_id uuid NOT NULL, issued_at timestamptz NOT NULL,
+  location_id uuid NOT NULL, source_id uuid NOT NULL, issued_at timestamptz,
+  issued_at_basis text NOT NULL DEFAULT 'UNKNOWN' CHECK(issued_at_basis IN ('PROVIDER','UNKNOWN')),
   retrieved_at timestamptz NOT NULL DEFAULT now(), provider_run_id text,
   payload_sha256 char(64), quality text NOT NULL DEFAULT 'VALID',
   FOREIGN KEY (workspace_id,location_id) REFERENCES weather.locations(workspace_id,id),
@@ -171,6 +173,7 @@ CREATE TABLE knowledge.chunks (
   CHECK(page_end IS NULL OR page_start IS NULL OR page_end>=page_start)
 );
 CREATE INDEX knowledge_chunk_lexical_idx ON knowledge.chunks USING gin(lexical);
+CREATE INDEX knowledge_chunk_trgm_idx ON knowledge.chunks USING gin(chunk_text gin_trgm_ops);
 CREATE INDEX knowledge_chunk_tags_idx ON knowledge.chunks USING gin(topics);
 CREATE TABLE knowledge.embedding_spaces (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(), model_id text NOT NULL, revision text NOT NULL,
@@ -237,13 +240,16 @@ CREATE TABLE ai_execution.model_usage (
   cost_usd numeric(14,8) NOT NULL DEFAULT 0, happened_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE(workspace_id,request_id), CHECK(input_tokens>=0 AND output_tokens>=0 AND cost_usd>=0)
 );
+-- Single dispatcher with inbox dedupe. Additional durable subscribers need per-consumer delivery state.
 CREATE TABLE processing.outbox (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(), workspace_id uuid NOT NULL REFERENCES registry.workspaces(id),
   producer text NOT NULL, aggregate_kind text NOT NULL, aggregate_id uuid NOT NULL,
   aggregate_version bigint NOT NULL, event_type text NOT NULL, schema_version integer NOT NULL,
   subject jsonb NOT NULL, changed_fields text[] NOT NULL DEFAULT '{}',
   data_ref text NOT NULL, payload jsonb NOT NULL DEFAULT '{}'::jsonb,
+  effective_at timestamptz, occurred_at timestamptz NOT NULL DEFAULT now(),
   recorded_at timestamptz NOT NULL DEFAULT now(), available_at timestamptz NOT NULL DEFAULT now(),
+  correlation_id uuid NOT NULL, causation_id uuid,
   delivered_at timestamptz, attempts integer NOT NULL DEFAULT 0, last_error text,
   UNIQUE(workspace_id,producer,aggregate_kind,aggregate_id,aggregate_version,event_type)
 );

@@ -1,6 +1,6 @@
 # Architecture guardrails — accepted business purpose
 
-Status: **Gate 3 component proposal**. Applies to every agent, ADR, schema, implementation and review.
+Status: **Gates 1–3 approved; Gate 4 LLD reviewed locally**. Applies to every agent, ADR, schema, implementation and review.
 
 ## Business objective and constraints (priority order)
 

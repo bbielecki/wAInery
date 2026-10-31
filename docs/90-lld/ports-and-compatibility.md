@@ -4,7 +4,7 @@
 
 ```csharp
 public readonly record struct WorkspaceId(Guid Value);
-public sealed record SubjectRef(WorkspaceId Workspace, string Module, string Kind, Guid Id);
+public sealed record SubjectRef(WorkspaceId Workspace, string Module, string Kind, string Id);
 public sealed record DataVersion(string SourceId, string Version, DateTimeOffset KnownAt);
 public sealed record DomainChange(Guid EventId, int SchemaVersion, WorkspaceId Workspace,
     SubjectRef Subject, string EventType, IReadOnlySet<string> ChangedFields,
@@ -23,6 +23,8 @@ public interface IDecisionReadPort { Task<DecisionPlanDto?> GetLatestAsync(Subje
 public interface IObjectStorage { Task<ObjectInfo> PutAsync(Stream data, string classification, CancellationToken ct); Task<Stream> OpenReadAsync(string key, CancellationToken ct); }
 public interface INotificationChannel { Task<DeliveryResult> SendAsync(NotificationMessage message, CancellationToken ct); } // Future phase only
 ```
+
+**Identity rule:** public `SubjectRef.Id` and `SourceId` in v1 JSON contracts are stable opaque strings (e.g. `wb-2026-001`, `manual-reading`). PostgreSQL stores internal UUIDs. Each owning module exposes a resolution port mapping `(workspace, kind, publicId)` to canonical internal UUID, validates existence/ownership, and never guesses by name. External IDs cannot be reused for a different object. Registry does the equivalent for `SourceId`. `aggregateId` in event v1 is likewise an opaque stable string. **Do not break existing v1 fixtures by silently enforcing UUID on string IDs.**
 
 Owner aggregate types are **not** shared; public ports return immutable DTOs from module `Contracts` project. Cross-module runtime calls go through ports, not EF entities, storage schemas, or internal namespaces.
 

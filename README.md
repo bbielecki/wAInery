@@ -1,6 +1,6 @@
 # wAInery — Smart Winery AI
 
-> **Status:** Gate 1 repository layout **accepted**; Gate 2 bounded contexts **accepted**; Gate 3 component architecture **proposed for approval**. No implementation or GitHub publication yet.
+> **Status:** Gate 1 repository layout **accepted**; Gate 2 bounded contexts **accepted**; Gate 3 component architecture **approved**; Gate 4 detailed design drafted and reviewed locally. No application implementation or remote GitHub publication yet.
 
 A **local-first**, cost-constrained, modular decision-intelligence platform for a Polish vineyard and winery. The MVP deliberately uses 1–2 private books, curated internet sources, descriptive activity history and free weather forecasts. The primary measure is **evidence-backed, feasible next actions and timing** under real Polish conditions, compared against a reference evaluation set — not UI richness or agent count.
 

@@ -1,6 +1,6 @@
 # Instructions for independent implementation agents
 
-**Project status:** Gate 1 and Gate 2 accepted; Gate 3 component contracts proposed for user review. **Do not implement until component seams are approved and Gate 4 LLD/spec contracts are frozen.**
+**Project status:** Gates 1–3 accepted by user. Gate 4 LLD drafted and reviewed locally; implementation begins only after integration owner freezes shared contracts and finalizes tests/migration execution. See `docs/90-lld/README.md`.
 
 Read `docs/00-governance/architecture-guardrails.md`, `docs/00-governance/parallel-agent-protocol.md`, your module's `docs/30-components/<module>.md`, and `docs/40-contracts/catalog.md`.
 
