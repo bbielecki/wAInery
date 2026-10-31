@@ -21,6 +21,7 @@ A branch addresses one vertical user-observable change or one **well-bounded pre
 | **6. Independent review** | Separate reviewer + Architect as needed | PR review comment, high/medium/low findings, ADR when needed | No unresolved correctness, contract, confidentiality, safety or cost-blocking findings |
 | **7. Merge** | Integration Owner or authorized human | Squash/merge PR after required checks | Updated branch, checks green, evidence and handoff in PR |
 | **8. Verify** | QA + Product Owner | First vertical flow, scenario evaluations, cost/perf baseline and rollback note | User-facing quality gate met or explicitly flagged not met |
+| **9. Learn / reuse** | Author + receiving owners + Architect + QA | Verified lesson/pattern or `No transferable finding`; relevant skill proposal, acknowledgement, milestone Learning Digest | Evidence-backed, reviewed, no duplicate source of truth or privacy leak |
 
 **Do not skip from planned design to seven simultaneous implementations.** Wave 0 (compiled contracts + real SQL migration test + one vertical slice) is mandatory and **not currently complete**. The committed monorepo currently validates structure/build only.
 
@@ -74,3 +75,7 @@ P0: domain/safety/security violations, false performed operations, leakage, inva
 Record `CostPerAcceptedPlan`, unnecessary AI calls, latency from accepted event to updated prediction, percentage of impacted scopes actually recomputed, plan freshness, evidence Recall@5, expert-reviewed AcceptableTopPlanRate and critical forbidden actions. A model-quality improvement must be tested on held-out scenarios; do not optimize scores by modifying fixtures after viewing output.
 
 **CI status at document publication:** `.github/workflows/monorepo-build.yml` runs restore/build/project graph. Actual unit/contract/Postgres/evaluation test projects and required branch protection must be added in Wave 0 and later waves; this document specifies future gates, not existing green checks.
+
+## Knowledge-sharing and reusable skills
+
+Read the [engineering learning and skills policy](../00-governance/agent-learning-and-skills.md) and [knowledge base](../../agents/knowledge/README.md). Each meaningful implementation PR includes transferable findings or says `No transferable finding`. Receiving modules review impact via contract-focused handoffs. At every milestone, Architect scans repeated reviewer corrections, test sequences and manual actions and proposes small skills in `.agents/skills/` only where reuse is justified and testable. Skill updates use separate reviewable PRs, with positive/negative validation; scripts and CI are preferred for mechanically enforceable checks. Summarize accepted lessons, skill changes and cross-team consumers in the milestone report; **do not continue to the next gate without Product Owner approval**.
