@@ -83,7 +83,7 @@ If a test suite does not exist, **implement an appropriately scoped one first**.
 - Rebase before merge, rerun required tests on the updated head, then **squash merge**. For shared contract/migration changes, Integration Owner also verifies downstream consumer fixtures.
 - Delete the **remote** feature branch **only after** GitHub confirms a successful merge and required integration checks; never delete an unmerged branch simply because it is old.
 - Delete local worktree/branch after merge, preserving any untracked changes safely. Reference PR/commit in handoff. A reopened bug uses a **new** branch from current `main`, not the old branch.
-- GitHub Actions `cleanup-merged-branches.yml` removes eligible same-repo remote heads after successful merge, while respecting the base branch. Repo setting **Automatically delete head branches** is an optional complementary safeguard.
+- GitHub Actions `cleanup-merged-branches.yml` removes eligible same-repo remote heads after successful merge, while respecting the base branch. Repo setting **Automatically delete head branches** is an optional complementary safeguard. **Initial cleanup completed:** all historical merged branches were deleted on 2026-11-01; permanent automation now targets newly merged PR branches only.
 - Clean old branches on discovery only after `git merge-base --is-ancestor origin/<branch> origin/main` is true; check no open PR depends on the branch. Do not force-delete unknown/unsquashed work.
 
 ## GitHub repository settings to enable (human / admin)
