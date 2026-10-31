@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <AssemblyName>wAInery.Host</AssemblyName>
+    <RootNamespace>wAInery.Host</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../BuildingBlocks/wAInery.BuildingBlocks.csproj" />
+    <ProjectReference Include="../Modules/Vineyard/wAInery.Modules.Vineyard.csproj" />
+    <ProjectReference Include="../Modules/Winery/wAInery.Modules.Winery.csproj" />
+    <ProjectReference Include="../Modules/Decisions/wAInery.Modules.Decisions.csproj" />
+    <ProjectReference Include="../Modules/Observations/wAInery.Modules.Observations.csproj" />
+    <ProjectReference Include="../Modules/Weather/wAInery.Modules.Weather.csproj" />
+    <ProjectReference Include="../Modules/Knowledge/wAInery.Modules.Knowledge.csproj" />
+    <ProjectReference Include="../Modules/Connectivity/wAInery.Modules.Connectivity.csproj" />
+    <ProjectReference Include="../Modules/AIExecution/wAInery.Modules.AIExecution.csproj" />
+  </ItemGroup>
+</Project>
