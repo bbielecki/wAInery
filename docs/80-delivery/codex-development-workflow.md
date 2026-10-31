@@ -89,3 +89,7 @@ Cloud task availability and execution limits are account/workspace-dependent. Th
 - [Codex harness / CLI exec / SDK](https://developers.openai.com/blog/codex-as-a-platform)
 
 The authoritative [trunk-based workflow](../00-governance/trunk-based-collaboration.md) controls mandatory branch lifetime, conflict handling, merge order, CI check, cleanup and GitHub ruleset requirements.
+
+## Shared knowledge and repo-local skills
+
+When assigning a Codex task, include only relevant entries from [agents/knowledge](../../agents/knowledge/README.md) and discovered repo skills from [registry](../../agents/knowledge/skill-registry.md). Use skills such as `wainery-pr-verification`, `wainery-contract-change` and `wainery-learnings-review` for their declared triggers; **don't invoke every skill for every task**. The architect reviews repeated tasks at each gate and proposes tested new skills only when they reduce rework/quality regressions or cost. All updates are committed through short-lived branches and independent review. The [versioned implementation orchestrator prompt](../../agents/prompts/implementation-orchestrator.md) includes this behavior and mandatory milestone stops.

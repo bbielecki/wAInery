@@ -24,6 +24,8 @@
 - **Upstream prerequisites:** 
 - **Downstream consumers / handoffs:** 
 - **Non-goals:** 
+- **Relevant verified lessons/patterns (links, or none):** 
+- **Relevant skills to reuse and why (or none):** 
 
 ## Context for agent
 
@@ -57,6 +59,9 @@ Read: `AGENTS.md`, `docs/10-architecture/business-hld.md`, `docs/80-delivery/age
 - **Evidence of business acceptance:** 
 - **Review findings and resolutions:** 
 - **Open risks/dependencies:** 
+- **Transferable finding + proof (or `No transferable finding`):** 
+- **Downstream module owners informed / acknowledgement:** 
+- **Repeated workflow or candidate skill proposed for architect review:** 
 - **Next recommended task:** 
 
 **Stop condition:** If a frozen public contract is inadequate or ownership is unclear, stop and create a handoff/ADR proposal; do not silently redesign another module.

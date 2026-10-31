@@ -64,3 +64,9 @@ flowchart TD
 The PR author may run static analyzers and request a model self-review, but final review must inspect the **diff and tests** from a separate session/agent (and human for high-impact domain actions). Review for business fitness, data lineage/permissions, cross-context coupling, cache invalidation, failure handling and unnecessary AI spend. No formal process should replace evidence from executable tests.
 
 [SDLC](../80-delivery/agentic-sdlc.md) | [Test strategy](../70-quality/implementation-test-strategy.md) | [Codex workflow](../80-delivery/codex-development-workflow.md).
+
+## Team-wide learning responsibility
+
+The **Architect / Integration Owner is also the Engineering Knowledge Curator**: at every approved milestone, inspect recurring coding/review procedures and decide whether they should become a small tested Codex skill or a deterministic script/CI check. See [agent learning policy](agent-learning-and-skills.md).
+
+Implementation agents contribute **verified lessons and cross-module requests** after significant PRs, linking reproducible tests and real diffs; they do not silently rewrite canonical contracts or shared skills. Independent QA challenges generalizations, replays a failure scenario, and verifies skill behavior. Teams help one another through reviewed public contract examples, scoped pair-review and handoffs, not by editing another module's internals. Product Owner still approves business and safety changes.

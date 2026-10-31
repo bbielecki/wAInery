@@ -72,3 +72,7 @@ For the MVP use **VS Code + Codex in scoped Git worktrees**, not an uncontrolled
 ## Git workflow for implementation teams
 
 **Trunk-based development:** `main` is the only permanent integration branch. One small, independently testable feature per short-lived branch/worktree; **fetch + rebase onto current `main`** before final tests/review; **squash merge** to keep history clean; delete merged branch and worktree. Do not begin long-lived per-module or `develop` branches. See [mandatory agent collaboration rules](docs/00-governance/trunk-based-collaboration.md), [SDLC](docs/80-delivery/agentic-sdlc.md) and [PR checklist](.github/pull_request_template.md).
+
+## Shared agent knowledge and reusable skills
+
+Implementation agents share **reviewed engineering lessons and patterns** in [agent knowledge base](agents/knowledge/README.md). Repo-local Codex workflows are in [`.agents/skills/`](.agents/skills/) with a [skill registry](agents/knowledge/skill-registry.md). The Architect reviews repeated integration tasks and promotes *stable, testable, genuinely useful* procedures into reusable skills; agents exchange contract-focused handoffs and verify each other's assumptions. The practice is governed by [Agent Learning & Skills Policy](docs/00-governance/agent-learning-and-skills.md). These assets are **developer knowledge, separate from the winemaking book RAG**. Start the coordinated rollout with the [orchestrator prompt](agents/prompts/implementation-orchestrator.md); milestone progress and skill/learning summaries require human review before advancing.

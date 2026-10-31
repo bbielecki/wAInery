@@ -23,3 +23,6 @@ jobs:
         run: dotnet build wAInery.slnx --no-restore --configuration Release
       - name: Validate module reference boundaries
         run: dotnet run --project tests/Architecture/wAInery.ArchitectureChecks.csproj --no-restore --configuration Release
+
+      - name: Validate shared Codex skills (including negative fixture)
+        run: python3 scripts/validate_agent_skills.py
