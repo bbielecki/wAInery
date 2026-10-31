@@ -28,3 +28,5 @@
 - [Task template](../agents/templates/implementation-task.md) — strict scope, contract versions and handoff.
 
 **Git collaboration:** [Trunk-based policy, rebase and branch cleanup](00-governance/trunk-based-collaboration.md) — applies to every implementation agent and PR.
+
+**Agent learning:** [Engineering knowledge and skill curation policy](00-governance/agent-learning-and-skills.md), [verified lessons](../agents/knowledge/README.md), [skill registry](../agents/knowledge/skill-registry.md) and [orchestrator prompt](../agents/prompts/implementation-orchestrator.md).
