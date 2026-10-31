@@ -1,0 +1,88 @@
+name: Cleanup merged feature branches
+
+on:
+  pull_request:
+    types: [closed]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  cleanup-merged-pr:
+    name: Delete merged PR head
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref != github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete only this merged pull request branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          CURRENT_SHA="$(gh api "repos/${REPO}/git/ref/heads/${BRANCH}" --jq '.object.sha' 2>/dev/null || true)"
+          if [ -z "${CURRENT_SHA}" ]; then
+            echo "Branch already absent; no cleanup needed."
+            exit 0
+          fi
+          if [ "${CURRENT_SHA}" != "${EXPECTED_SHA}" ]; then
+            echo "::warning::Branch advanced after PR merge; do not delete."
+            exit 0
+          fi
+          gh api --method DELETE "repos/${REPO}/git/refs/heads/${BRANCH}"
+          echo "Deleted merged branch: ${BRANCH}"
+
+  cleanup-known-legacy:
+    name: Safely retire four already-merged design branches
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Delete known old branches only if their commits are in main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin '+refs/heads/*:refs/remotes/origin/*'
+          for BRANCH in \
+            'build/monorepo-scaffold' \
+            'docs/agent-engineering-sdlc' \
+            'docs/architecture-review-business-hld' \
+            'docs/mvp-prediction-evaluation-contracts'; do
+            if ! git show-ref --verify --quiet "refs/remotes/origin/${BRANCH}"; then
+              echo "Already removed: ${BRANCH}"
+              continue
+            fi
+            if ! git merge-base --is-ancestor "refs/remotes/origin/${BRANCH}" refs/remotes/origin/main; then
+              echo "::warning::Not an ancestor of main; preserving: ${BRANCH}"
+              continue
+            fi
+            OPEN="$(gh pr list --repo "${REPO}" --head "${BRANCH}" --state open --json number --jq 'length')"
+            if [ "${OPEN}" != 0 ]; then
+              echo "::warning::Open PR exists; preserving: ${BRANCH}"
+              continue
+            fi
+            LOCAL_SHA="$(git rev-parse "refs/remotes/origin/${BRANCH}")"
+            REMOTE_SHA="$(gh api "repos/${REPO}/git/ref/heads/${BRANCH}" --jq '.object.sha' 2>/dev/null || true)"
+            if [ "${REMOTE_SHA}" != "${LOCAL_SHA}" ]; then
+              echo "::warning::Remote branch changed; preserving: ${BRANCH}"
+              continue
+            fi
+            gh api --method DELETE "repos/${REPO}/git/refs/heads/${BRANCH}"
+            echo "Deleted fully-merged legacy branch: ${BRANCH}"
+          done
