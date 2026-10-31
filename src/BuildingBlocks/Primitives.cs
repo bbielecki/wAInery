@@ -14,9 +14,17 @@ public sealed record SubjectRef(WorkspaceId Workspace, string Module, string Kin
 
 public sealed record EvidenceRef(string SourceId, string Version, string Locator);
 
-public readonly record struct TimeWindow(DateTimeOffset From, DateTimeOffset To)
+public readonly record struct TimeWindow
 {
-    public bool IsValid => To > From;
+    public DateTimeOffset From { get; }
+    public DateTimeOffset To { get; }
+
+    public TimeWindow(DateTimeOffset from, DateTimeOffset to)
+    {
+        if (to <= from) throw new ArgumentOutOfRangeException(nameof(to), "End must be after start.");
+        From = from;
+        To = to;
+    }
 }
 
 public sealed record Quantity(decimal Value, string Unit, string? Method = null);
