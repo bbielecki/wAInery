@@ -4,6 +4,8 @@
 
 Read `docs/00-governance/architecture-guardrails.md`, `docs/00-governance/parallel-agent-protocol.md`, your module's `docs/30-components/<module>.md`, and `docs/40-contracts/catalog.md`.
 
+Before implementing, read [`docs/90-lld/implementation-contract-freeze.md`](docs/90-lld/implementation-contract-freeze.md) and [`docs/80-delivery/mvp-vertical-slice.md`](docs/80-delivery/mvp-vertical-slice.md). `Decisions`, Vineyard and Winery additionally read [`prediction-catalog.md`](docs/90-lld/prediction-catalog.md); Knowledge and advisor agents read [`polish-context-evidence-policy.md`](docs/90-lld/polish-context-evidence-policy.md); independent QA reads [`evaluation-protocol.md`](docs/90-lld/evaluation-protocol.md). These documents are **specifications**, not evidence of runnable features.
+
 ## Non-negotiable
 
 - Optimize for **evidence-based, Polish-contextualized** next-action quality with minimal local running costs; no gratuitous features/infra.
