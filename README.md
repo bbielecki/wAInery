@@ -1,17 +1,44 @@
 # wAInery — Smart Winery AI
 
-> **Status:** Gate 1 repository layout **accepted**; Gate 2 bounded contexts **accepted**; Gate 3 component architecture **approved**; Gate 4 detailed design drafted and reviewed locally. No application implementation or remote GitHub publication yet.
+**Product:** local-first decision intelligence for growing grapes and making wine in Poland.  
+**Status:** Gates 1–3 (layout, domains, components) approved; Gate 4 LLD documented and architecture-reviewed, **not yet implemented or scientifically validated**. See the [business HLD](docs/10-architecture/business-hld.md) and [architecture assessment](docs/70-quality/architecture-review-2026-11.md).
 
-A **local-first**, cost-constrained, modular decision-intelligence platform for a Polish vineyard and winery. The MVP deliberately uses 1–2 private books, curated internet sources, descriptive activity history and free weather forecasts. The primary measure is **evidence-backed, feasible next actions and timing** under real Polish conditions, compared against a reference evaluation set — not UI richness or agent count.
+## Business HLD — what the product must do
 
-## Non-negotiable
+For a specific **vineyard block or wine batch**, wAInery recommends **what to do next, when and why**. It should compare **multiple feasible actions**, including measure-first, wait or do nothing, explain dependencies/risks and cite applicable evidence. It must account for the vineyard's **Polish microclimate, varieties, phenology and real operational history**, not rely primarily on generic book advice.
 
-1. Cheap local .NET + one PostgreSQL/pgvector + local file storage; optional metered AI API, no always-on cloud/broker.
-2. Canonical data ownership across eight approved contexts; reusable contracted ports, inexpensive additive schema changes allowed.
-3. After each accepted data change, identify dependent prediction scopes; run AI only when warranted by decision impact.
-4. Compare feasible actions, admit uncertainty, cite evidence, never fabricate numeric probabilities.
-5. Protected privately scanned books remain local under source rights policy; no source text, OCR, embeddings or private records in Git.
-6. Agents are implementation roles and runtime logical specialists, not necessarily separate deployed services.
-7. Extensible IoT sources, AI models, UIs, notification channels and future paid hosting without rewriting canonical data.
+**MVP inputs:** 1–2 privately scanned books, curated online sources, owner-written descriptions of vineyard/cellar activities and observations, one free forecast API.  
+**MVP output:** a persisted, versioned action plan and local report with priority, time window, alternatives, rationale, missing data, evidence and qualitative uncertainty. **Percentages appear only when justified by an independently assessed model.**
 
-Read [architecture guardrails](docs/00-governance/architecture-guardrails.md), [component design](docs/30-components/overview.md), [domain context map](docs/20-domains/context-map.md), [review gates](docs/00-governance/review-gates.md), and [agent protocol](docs/00-governance/parallel-agent-protocol.md).
+```mermaid
+flowchart LR
+    Source["Accepted data change"] --> Facts["Domain-owned facts + outbox"]
+    Facts --> Scope["Incremental impact / stale scopes"]
+    Scope --> Rules["Local risk models & materiality"]
+    Rules --> Decision{"Advice needed?"}
+    Decision -->|No| Plan["Versioned feasible action plan"]
+    Decision -->|Yes| Evidence["Scoped context, RAG, specialist advisor"]
+    Evidence --> Plan
+    Plan --> Report["Local report + human feedback"]
+```
+
+Every accepted change must lead to **dependent** prediction assessment; it must **not** trigger all models/agents. The owner confirms actual work; an AI suggestion never becomes a performed operation automatically. The offline/local MVP does not guarantee alerts while the computer is off.
+
+## Architecture at a glance
+
+| Core bounded contexts | Supporting contexts | Platform modules |
+|---|---|---|
+| **Vineyard** — land/varieties/field work; **Winery** — batches, vessels and cellar operations; **Decisions** — predictions, alternatives and plans | **Observations** — typed measurement quality; **Weather** — immutable forecasts; **Knowledge** — copyrighted books/web evidence and RAG | **Connectivity** — adapters, source receipts, replay; **AIExecution** — model/provider/agent gateway and cost/egress policy |
+
+One local **.NET 10 modular monolith + PostgreSQL/pgvector + private files**; pay-per-use external AI only when justified. Cross-module communication is through owner-controlled contracts, no direct foreign EF entities or writes. Future sensors, station, new measurements, model vendors, UIs, notifications, cloud and multi-tenancy are **extension stages**, not extra MVP services. Additive schema migrations are acceptable; canonical facts and source provenance must survive.
+
+## Business acceptance and safeguards
+
+- Expert-review **30–50 representative cases** for safe next action, time, multiple acceptable alternatives, citation grounding and Polish applicability; compare against cheaper baselines. **The goal is not yet measured.**
+- Test scoped recomputation, as-of forecast/operations replay, budget limits, idempotent restart and the absence of unnecessary LLM calls.
+- Private scanned books and derived content remain in protected local storage, outside Git. Source rights and external model egress policy apply before evidence leaves the computer; no public access required for MVP.
+- **Parallel implementation:** freeze compiled contracts and migration strategy (Wave 0), then seven independently owned modules (Wave 1), integrate Decisions and workflows (Wave 2–3). The [review](docs/70-quality/architecture-review-2026-11.md) records remaining Wave 0 blockers; no running solution is claimed.
+
+## Documentation
+
+Start with the [business HLD](docs/10-architecture/business-hld.md), [architecture guardrails](docs/00-governance/architecture-guardrails.md), [bounded context map](docs/20-domains/context-map.md), [component design](docs/30-components/overview.md), [LLD index](docs/90-lld/README.md), [contract freeze](docs/90-lld/implementation-contract-freeze.md), [evaluation protocol](docs/90-lld/evaluation-protocol.md), [delivery plan](docs/80-delivery/implementation-dag.md) and [agent collaboration rules](AGENTS.md).
