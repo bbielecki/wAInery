@@ -1,4 +1,4 @@
-# Contract catalog / public surface (Gate 3 proposal)
+# Contract catalog / public surface (Gate 3 accepted; C# contracts pending Wave 0 freeze)
 
 ## Ownership convention
 
@@ -30,27 +30,11 @@ The owning domain publishes **commands and queries as explicit public DTOs**; on
 - Recommendation candidate has `kind`, `subject`, `actionType`, `dependencies`, `exclusivityGroup?`, feasible/constraint findings, timing window, human-approval requirement, and citations. Ranking is performed in Decisions.
 - `eventProbability` and `actionEffectiveness` nullable unless backed by an auditable source/model + calibration metadata. `evidenceConfidence` is separately qualitative (`LOW|MEDIUM|HIGH|UNKNOWN`).
 
-## Interface sketch (proposed, not frozen C#)
+## Canonical C# sketch (not frozen compiled code)
 
-```csharp
-public interface IWeatherReadPort {
-    Task<ForecastWindowResult> GetWindowAsync(WeatherWindowQuery query, CancellationToken ct);
-}
-public interface IObservationReadPort {
-    Task<ObservationWindowResult> QueryAsync(ObservationWindowQuery query, CancellationToken ct);
-}
-public interface IKnowledgeSearchPort {
-    Task<EvidenceSearchResult> SearchAsync(EvidenceSearchRequest request, CancellationToken ct);
-}
-public interface IReasoningExecutor {
-    Task<AgentAdviceResult> ExecuteAsync(AgentAdviceRequest request, CancellationToken ct);
-}
-public interface IDecisionReadPort {
-    Task<DecisionPlanDto?> GetAsync(Guid workspaceId, Guid planId, CancellationToken ct);
-}
-```
+Use [LLD public ports](../90-lld/ports-and-compatibility.md) as the **single canonical reference for C# sketch names and signatures** until the Integration Owner publishes a compiling `*.Contracts` assembly. In particular, `IReasoningExecutor.AdviseAsync`, `IDecisionReadPort.GetLatestAsync` and `IWeatherReadPort.GetKnownForecastAsync` are the current design names. Do not implement alternative sketches from older notes.
 
-Specific DTO/property names will be finalized in Gate 4 full LLD. Machine schemas here serve as interoperable design tests, **not** a claim all APIs exist or compile.
+The *wire* `SubjectRef` nests `module/kind/id` under an envelope/request-level `workspaceId`; the in-process C# value object may include `WorkspaceId` explicitly. Every boundary validates workspace equality. JSON schemas in `/contracts` remain authoritative for their serialized v1 fields and examples; C# compilation/freeze remains Wave 0 work.
 
 ## Contract compatibility tests
 
