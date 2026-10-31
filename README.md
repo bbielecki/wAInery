@@ -55,3 +55,16 @@ dotnet run --project tests/Architecture/wAInery.ArchitectureChecks.csproj
 ```
 
 See [Wave 0 blockers](docs/70-quality/architecture-review-2026-11.md) before assigning parallel module implementation.
+
+## How to implement with coding agents
+
+For the MVP use **VS Code + Codex in scoped Git worktrees**, not an uncontrolled swarm. Four implementation workstreams share one Integration Owner and independent QA; start with one or two coding sessions, only expand after Wave 0 contracts and Postgres migrations work. Each PR must be tested, independently reviewed, cost-aware and traceable to a business outcome.
+
+- [Mandatory agent instructions](AGENTS.md)
+- [Agent team and domain ownership](docs/00-governance/agent-team-topology.md)
+- [SDLC, branch and review policy](docs/80-delivery/agentic-sdlc.md)
+- [Testing and evaluation gates](docs/70-quality/implementation-test-strategy.md)
+- [Codex IDE and Git worktrees](docs/80-delivery/codex-development-workflow.md)
+- [Agent assignment template](agents/templates/implementation-task.md)
+
+**Current CI:** solution build and module reference graph. Compiling public business ports, real PostgreSQL migrations, integration tests and 30–50 expert scenarios are **next implementation work**, not existing functionality.
