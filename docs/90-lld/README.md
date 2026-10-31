@@ -9,6 +9,8 @@
 4. [Decision planning](agents-and-decisions.md), [retrieval](knowledge-and-retrieval.md), [ingestion](source-adapters.md).
 5. [Runtime and cost](runtime-and-cost.md), [safety, reliability](safety-and-recovery.md), [evaluation](evaluation-and-acceptance.md).
 6. [Parallel implementation](parallel-delivery.md), [review](../70-quality/gate4-review.md).
+7. [Prediction catalog](prediction-catalog.md), [Polish-context evidence policy](polish-context-evidence-policy.md), [evaluation protocol](evaluation-protocol.md), [implementation contract freeze](implementation-contract-freeze.md).
+8. [MVP vertical slice](../80-delivery/mvp-vertical-slice.md), [extension review](../70-quality/gate5-documentation-review.md).
 
 ## Explicit MVP product boundary
 - 1–2 **privately stored** scanned books; curated URL imports; owner-written narrative observations and **confirmed** actions; one forecast adapter, without public server or sensors.

@@ -136,6 +136,8 @@ CREATE TABLE weather.forecast_runs (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(), workspace_id uuid NOT NULL,
   location_id uuid NOT NULL, source_id uuid NOT NULL, issued_at timestamptz,
   issued_at_basis text NOT NULL DEFAULT 'UNKNOWN' CHECK(issued_at_basis IN ('PROVIDER','UNKNOWN')),
+  CHECK ((issued_at_basis='PROVIDER' AND issued_at IS NOT NULL) OR
+         (issued_at_basis='UNKNOWN' AND issued_at IS NULL)),
   retrieved_at timestamptz NOT NULL DEFAULT now(), provider_run_id text,
   payload_sha256 char(64), quality text NOT NULL DEFAULT 'VALID',
   FOREIGN KEY (workspace_id,location_id) REFERENCES weather.locations(workspace_id,id),
@@ -147,7 +149,8 @@ CREATE TABLE weather.forecast_points (
   value numeric(20,8), unit text NOT NULL, attributes jsonb NOT NULL DEFAULT '{}'::jsonb,
   PRIMARY KEY(forecast_run_id,valid_at,variable_code)
 );
-CREATE INDEX weather_runs_lookup_idx ON weather.forecast_runs(workspace_id,location_id,issued_at DESC);
+CREATE INDEX weather_runs_lookup_idx ON weather.forecast_runs(workspace_id,location_id,retrieved_at DESC);
+-- as-of forecast selection requires retrieved_at <= asOf; additionally issued_at <= asOf when known.
 CREATE TABLE knowledge.documents (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(), workspace_id uuid NOT NULL REFERENCES registry.workspaces(id),
   source_id uuid NOT NULL, title text NOT NULL, document_kind text NOT NULL,
