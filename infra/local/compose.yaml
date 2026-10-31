@@ -1,0 +1,19 @@
+# Local-only database. Application stays on the developer host and binds to loopback.
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_DB: wainery
+      POSTGRES_USER: wainery
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in a local .env}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wainery -d wainery"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+volumes:
+  pgdata:
