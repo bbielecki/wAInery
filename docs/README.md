@@ -26,3 +26,5 @@
 - [Test and business evaluation strategy](70-quality/implementation-test-strategy.md) — runnable and planned quality gates explicitly separated.
 - [VS Code + Codex workflow](80-delivery/codex-development-workflow.md) — local worktrees, optional cloud tasks and limitations.
 - [Task template](../agents/templates/implementation-task.md) — strict scope, contract versions and handoff.
+
+**Git collaboration:** [Trunk-based policy, rebase and branch cleanup](00-governance/trunk-based-collaboration.md) — applies to every implementation agent and PR.
