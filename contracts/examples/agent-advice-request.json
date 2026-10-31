@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "requestId": "e25e7962-27c9-4bd3-a03d-e37cf7df38a1",
+  "workspaceId": "2c887032-d441-4cba-b9e0-d10a837dbb09",
+  "purpose": "PRIVATE_ADVICE",
+  "role": "WINEMAKING_ADVISOR",
+  "subject": {
+    "module": "Winery",
+    "kind": "WineBatch",
+    "id": "wb-2026-001"
+  },
+  "asOf": "2026-10-31T10:15:00Z",
+  "inputRevision": 12,
+  "sourceVersions": [
+    {
+      "sourceId": "observations:obs-0001",
+      "version": "1",
+      "classification": "PRIVATE_OPERATIONAL"
+    }
+  ],
+  "evidenceRefs": [
+    "knowledge:book1:v1:p42"
+  ],
+  "facts": [
+    {
+      "key": "wine_temperature",
+      "value": 16.4,
+      "unit": "Cel",
+      "sourceRef": "observations:obs-0001",
+      "classification": "PRIVATE_OPERATIONAL"
+    }
+  ],
+  "allowedTools": [
+    "GET_OBSERVATIONS"
+  ],
+  "outputSchemaId": "AgentAdviceResultV1",
+  "maxInputTokens": 2000,
+  "maxOutputTokens": 600,
+  "maxCostUsd": 0.01,
+  "timeoutMs": 30000
+}

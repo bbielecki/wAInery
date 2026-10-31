@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "planId": "c514653a-6699-4582-b186-36e0fd202871",
+  "workspaceId": "2c887032-d441-4cba-b9e0-d10a837dbb09",
+  "subject": {
+    "module": "Winery",
+    "kind": "WineBatch",
+    "id": "wb-2026-001"
+  },
+  "planRevision": 1,
+  "state": "INSUFFICIENT_DATA",
+  "asOf": "2026-10-31T10:15:00Z",
+  "inputRevision": 12,
+  "evidenceRefs": [
+    "observations:obs-0001"
+  ],
+  "predictions": [
+    {
+      "predictionId": "fermentation-progress:w1",
+      "predictionKind": "fermentation_progress",
+      "status": "INSUFFICIENT_DATA",
+      "horizonStart": "2026-10-31T10:15:00Z",
+      "horizonEnd": "2026-11-01T10:15:00Z",
+      "eventProbability": null,
+      "evidenceRefs": [
+        "observations:obs-0001"
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "actionId": "measure1",
+      "actionType": "MEASURE",
+      "description": "Obtain another temperature and sugar measurement before intervention.",
+      "evidenceRefs": [
+        "observations:obs-0001"
+      ],
+      "confidence": "MEDIUM",
+      "feasibility": "FEASIBLE",
+      "requiresUserApproval": true,
+      "rankingScore": 0.8,
+      "effectivenessProbability": null
+    },
+    {
+      "actionId": "observe1",
+      "actionType": "OBSERVE",
+      "description": "Continue observation with no immediate process adjustment.",
+      "evidenceRefs": [
+        "observations:obs-0001"
+      ],
+      "confidence": "LOW",
+      "feasibility": "CONDITIONAL",
+      "requiresUserApproval": false,
+      "rankingScore": 0.2
+    }
+  ],
+  "selectedActionIds": [
+    "measure1"
+  ],
+  "alternativeActionIds": [
+    "observe1"
+  ],
+  "reason": "Trend unavailable; prioritize obtaining data rather than making an unsupported adjustment.",
+  "inputSnapshotRef": "decision-inputs:wb-2026-001:12",
+  "createdAt": "2026-10-31T10:15:04Z"
+}

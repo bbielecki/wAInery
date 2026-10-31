@@ -1,0 +1,341 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wainery.local/contracts/api/decision-plan.v1.schema.json",
+  "title": "DecisionPlanV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "planId",
+    "workspaceId",
+    "subject",
+    "planRevision",
+    "state",
+    "asOf",
+    "inputRevision",
+    "evidenceRefs",
+    "predictions",
+    "actions",
+    "selectedActionIds",
+    "alternativeActionIds",
+    "reason"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "planId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "workspaceId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "module",
+        "kind",
+        "id"
+      ],
+      "properties": {
+        "module": {
+          "enum": [
+            "Vineyard",
+            "Winery",
+            "Observations",
+            "Weather",
+            "Knowledge",
+            "Connectivity",
+            "Decisions"
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    },
+    "planRevision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "state": {
+      "enum": [
+        "CURRENT",
+        "STALE",
+        "INSUFFICIENT_DATA",
+        "FAILED",
+        "SUPERSEDED"
+      ]
+    },
+    "asOf": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "inputRevision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "evidenceRefs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "predictions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "predictionId",
+          "predictionKind",
+          "status",
+          "horizonStart",
+          "horizonEnd",
+          "evidenceRefs"
+        ],
+        "properties": {
+          "predictionId": {
+            "type": "string"
+          },
+          "predictionKind": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "CURRENT",
+              "STALE",
+              "RECOMPUTING",
+              "FAILED",
+              "INSUFFICIENT_DATA"
+            ]
+          },
+          "horizonStart": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "horizonEnd": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "eventProbability": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "value",
+                  "method",
+                  "modelVersion",
+                  "calibrationStatus",
+                  "dataBasis"
+                ],
+                "properties": {
+                  "value": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "method": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "modelVersion": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "calibrationStatus": {
+                    "enum": [
+                      "VALIDATED",
+                      "UNVALIDATED",
+                      "EXPERT_ESTIMATE"
+                    ]
+                  },
+                  "dataBasis": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evaluationRef": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "evidenceRefs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "actionId",
+          "actionType",
+          "description",
+          "evidenceRefs",
+          "confidence",
+          "feasibility",
+          "requiresUserApproval"
+        ],
+        "properties": {
+          "actionId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "actionType": {
+            "enum": [
+              "MEASURE",
+              "OBSERVE",
+              "NO_ACTION",
+              "ESCALATE",
+              "TREATMENT",
+              "PROCESS_ADJUSTMENT",
+              "OTHER"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidenceRefs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "confidence": {
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "UNKNOWN"
+            ]
+          },
+          "feasibility": {
+            "enum": [
+              "FEASIBLE",
+              "CONDITIONAL",
+              "NOT_FEASIBLE",
+              "UNKNOWN"
+            ]
+          },
+          "requiresUserApproval": {
+            "type": "boolean"
+          },
+          "rankingScore": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "prerequisiteActionIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "exclusivityGroup": {
+            "type": "string"
+          },
+          "effectivenessProbability": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "value",
+                  "method",
+                  "modelVersion",
+                  "calibrationStatus",
+                  "dataBasis"
+                ],
+                "properties": {
+                  "value": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "method": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "modelVersion": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "calibrationStatus": {
+                    "enum": [
+                      "VALIDATED",
+                      "UNVALIDATED",
+                      "EXPERT_ESTIMATE"
+                    ]
+                  },
+                  "dataBasis": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evaluationRef": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "selectedActionIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "alternativeActionIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "inputSnapshotRef": {
+      "type": "string"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "requestId": "e25e7962-27c9-4bd3-a03d-e37cf7df38a1",
+  "status": "OK",
+  "findings": [
+    {
+      "findingId": "f1",
+      "statement": "Only one temperature reading; fermentation trend cannot yet be inferred.",
+      "evidenceRefs": [
+        "observations:obs-0001"
+      ],
+      "confidence": "HIGH"
+    }
+  ],
+  "actionCandidates": [
+    {
+      "candidateId": "measure1",
+      "actionType": "MEASURE",
+      "description": "Measure temperature and residual sugar again; assess a trend before intervention.",
+      "evidenceRefs": [
+        "observations:obs-0001"
+      ],
+      "confidence": "MEDIUM",
+      "requiresUserApproval": true
+    }
+  ],
+  "usage": {
+    "provider": "mock",
+    "model": "offline-test",
+    "inputTokens": 0,
+    "outputTokens": 0,
+    "estimatedCostUsd": 0
+  }
+}

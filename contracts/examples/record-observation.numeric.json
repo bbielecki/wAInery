@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "workspaceId": "2c887032-d441-4cba-b9e0-d10a837dbb09",
+  "subject": {
+    "module": "Winery",
+    "kind": "WineBatch",
+    "id": "wb-2026-001"
+  },
+  "observationType": "wine_temperature",
+  "kind": "NUMERIC",
+  "sourceId": "manual-reading",
+  "observedAt": "2026-10-31T10:00:00Z",
+  "receivedAt": "2026-10-31T10:00:04Z",
+  "idempotencyKey": "manual-0001",
+  "numericValue": 16.4,
+  "unit": "Cel",
+  "quality": "UNCHECKED"
+}

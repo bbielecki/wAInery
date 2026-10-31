@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wainery.local/contracts/api/record-observation.v1.schema.json",
+  "title": "RecordObservationV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "workspaceId",
+    "subject",
+    "observationType",
+    "kind",
+    "sourceId",
+    "observedAt",
+    "receivedAt",
+    "idempotencyKey"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "workspaceId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "module",
+        "kind",
+        "id"
+      ],
+      "properties": {
+        "module": {
+          "enum": [
+            "Vineyard",
+            "Winery",
+            "Observations",
+            "Weather",
+            "Knowledge",
+            "Connectivity",
+            "Decisions"
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    },
+    "observationType": {
+      "type": "string",
+      "minLength": 1
+    },
+    "kind": {
+      "enum": [
+        "NUMERIC",
+        "NARRATIVE"
+      ]
+    },
+    "sourceId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "observedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "receivedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "minLength": 1
+    },
+    "numericValue": {
+      "type": "number"
+    },
+    "unit": {
+      "type": "string",
+      "minLength": 1
+    },
+    "narrativeText": {
+      "type": "string",
+      "minLength": 1
+    },
+    "method": {
+      "type": "string"
+    },
+    "instrumentRef": {
+      "type": "string"
+    },
+    "quality": {
+      "enum": [
+        "UNCHECKED",
+        "VALID",
+        "FLAGGED",
+        "QUARANTINED"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "NUMERIC"
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "then": {
+        "required": [
+          "numericValue",
+          "unit"
+        ],
+        "not": {
+          "required": [
+            "narrativeText"
+          ]
+        }
+      },
+      "else": {
+        "required": [
+          "narrativeText"
+        ],
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "numericValue"
+              ]
+            },
+            {
+              "required": [
+                "unit"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

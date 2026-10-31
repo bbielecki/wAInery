@@ -1,0 +1,21 @@
+{
+  "eventId": "742d88c2-5408-4240-92d4-e283b8b7f055",
+  "eventType": "ObservationRecorded",
+  "schemaVersion": 1,
+  "workspaceId": "2c887032-d441-4cba-b9e0-d10a837dbb09",
+  "aggregateId": "obs-0001",
+  "aggregateVersion": 1,
+  "subject": {
+    "module": "Winery",
+    "kind": "WineBatch",
+    "id": "wb-2026-001"
+  },
+  "effectiveAt": "2026-10-31T10:00:00Z",
+  "occurredAt": "2026-10-31T10:00:00Z",
+  "recordedAt": "2026-10-31T10:00:04Z",
+  "correlationId": "4fc919b8-5c88-44b7-a6b5-230d5f0f0a95",
+  "changedFields": [
+    "wine_temperature"
+  ],
+  "dataRef": "observations:obs-0001"
+}

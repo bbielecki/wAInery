@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wainery.local/contracts/tools/agent-advice-result.v1.schema.json",
+  "title": "AgentAdviceResultV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "requestId",
+    "status",
+    "findings",
+    "actionCandidates",
+    "usage"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "requestId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "status": {
+      "enum": [
+        "OK",
+        "INSUFFICIENT_DATA",
+        "UNAVAILABLE",
+        "POLICY_BLOCKED",
+        "ERROR"
+      ]
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "findingId",
+          "statement",
+          "evidenceRefs",
+          "confidence"
+        ],
+        "properties": {
+          "findingId": {
+            "type": "string"
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidenceRefs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "confidence": {
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "UNKNOWN"
+            ]
+          }
+        }
+      }
+    },
+    "actionCandidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "candidateId",
+          "actionType",
+          "description",
+          "evidenceRefs",
+          "confidence",
+          "requiresUserApproval"
+        ],
+        "properties": {
+          "candidateId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "actionType": {
+            "enum": [
+              "MEASURE",
+              "OBSERVE",
+              "NO_ACTION",
+              "ESCALATE",
+              "TREATMENT",
+              "PROCESS_ADJUSTMENT",
+              "OTHER"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidenceRefs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "confidence": {
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "UNKNOWN"
+            ]
+          },
+          "requiresUserApproval": {
+            "type": "boolean"
+          },
+          "notBefore": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "prerequisiteCandidateIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "exclusivityGroup": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "model",
+        "inputTokens",
+        "outputTokens",
+        "estimatedCostUsd"
+      ],
+      "properties": {
+        "provider": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        },
+        "inputTokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "outputTokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "estimatedCostUsd": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "errorCode": {
+      "type": "string"
+    }
+  }
+}
