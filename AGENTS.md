@@ -17,7 +17,7 @@ For a Polish vineyard/block or wine batch, deliver **the safest useful next acti
 - **Integration Owner only:** `wAInery.slnx`, `src/BuildingBlocks/**`, `src/Host/**`, `contracts/**`, `infra/**`, `.github/**`, shared migration assembly, root configs and shared fixtures.
 - **Module agent only:** its own `src/Modules/<Module>/**`, `tests/Modules/<Module>/**` and scoped handoff. Contract changes are proposed first; the integrator alone changes shared/consumer-facing contracts.
 - A module can import another module's **Contracts**, never another module's implementation or EF entities/tables. `Decisions` owns predictions, plans and ranking; `AIExecution` only provides controlled model execution. `Vineyard`/`Winery` own confirmed work, not `Connectivity`/LLM.
-- Use `agent/<module>/<issue-short-name>` feature branches, isolated **git worktrees** for simultaneous Codex sessions, one PR per bounded behavior. Never force-push `main`, rewrite another owner's files or silently resolve cross-context ambiguities. Shared changes require a separate Integration Owner PR / ADR.
+- Use `agent/<module>/<issue-short-name>` feature branches, isolated **git worktrees** for simultaneous Codex sessions, one PR per bounded behavior **directly into `main`**. **Mandatory: fetch and rebase onto latest `origin/main` before final CI/review/merge; repeat rebase if trunk moved.** Default **squash merge** for a clean single-commit trunk history; no long-lived integration/develop branches. Delete merged feature branches and local worktrees after successful integration. Never force-push `main`, rewrite another owner's files or silently resolve cross-context ambiguities. Shared changes require a separate Integration Owner PR / ADR.
 
 ## Domain, data and safety invariants
 
@@ -29,7 +29,7 @@ For a Polish vineyard/block or wine batch, deliver **the safest useful next acti
 
 ## Required implementation workflow
 
-**Issue → short design → frozen ports/fixtures → failing deterministic test → minimal implementation → local tests → independent PR review → authorized merge → regression check.** See [SDLC](docs/80-delivery/agentic-sdlc.md).
+**Issue → short design → frozen ports/fixtures → failing deterministic test → minimal implementation → local tests → rebase on current main → independent PR review + updated CI → squash merge → delete branch/worktree → regression check.** See [SDLC](docs/80-delivery/agentic-sdlc.md) and [mandatory trunk policy](docs/00-governance/trunk-based-collaboration.md).
 
 Baseline commands:
 
@@ -43,6 +43,6 @@ dotnet run --project tests/Architecture/wAInery.ArchitectureChecks.csproj
 
 ## Definition of agent handoff
 
-For every PR report: ticket/BR, affected modules and contract versions, scope and non-goals, file list, **exact tests actually executed** and failures/not-run reasons, data migration/outbox risks, rights/security checks, API costs, independent review findings and any blocked dependent work. No self-approval of safety-critical code, no merge on failed checks. Do not claim work continues in the background when the agent session stops.
+For every PR report: ticket/BR, affected modules and contract versions, scope and non-goals, file list, **exact tests actually executed** and failures/not-run reasons, data migration/outbox risks, rights/security checks, API costs, independent review findings and any blocked dependent work. No self-approval of safety-critical code, no merge on failed checks; no merge when behind main, even if diff is conflict-free. Do not claim work continues in the background when the agent session stops.
 
 **STOP and ask Integration Owner** before touching cross-module contracts, schema ownership, privacy/rights policy, economic limits or core domain boundaries. For business/safety decisions that cannot be inferred from accepted HLD, escalate to Product Owner.
