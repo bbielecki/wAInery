@@ -42,3 +42,16 @@ One local **.NET 10 modular monolith + PostgreSQL/pgvector + private files**; pa
 ## Documentation
 
 Start with the [business HLD](docs/10-architecture/business-hld.md), [architecture guardrails](docs/00-governance/architecture-guardrails.md), [bounded context map](docs/20-domains/context-map.md), [component design](docs/30-components/overview.md), [LLD index](docs/90-lld/README.md), [contract freeze](docs/90-lld/implementation-contract-freeze.md), [evaluation protocol](docs/90-lld/evaluation-protocol.md), [delivery plan](docs/80-delivery/implementation-dag.md) and [agent collaboration rules](AGENTS.md).
+
+
+## Monorepo for implementation
+
+The repository now contains a .NET 10 [solution scaffold](wAInery.slnx) and a [local-first monorepo guide](docs/80-delivery/monorepo-bootstrap.md): 8 module contract assemblies, 8 isolated implementation projects, BuildingBlocks, one localhost Host, an architecture dependency check and local PostgreSQL/pgvector Compose. It is **not yet a running decision system**, nor have actual database migrations or agronomic evaluations been executed.
+
+```bash
+dotnet restore wAInery.slnx
+dotnet build wAInery.slnx
+dotnet run --project tests/Architecture/wAInery.ArchitectureChecks.csproj
+```
+
+See [Wave 0 blockers](docs/70-quality/architecture-review-2026-11.md) before assigning parallel module implementation.
