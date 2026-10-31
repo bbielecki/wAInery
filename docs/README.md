@@ -18,3 +18,11 @@
 | [90-lld](90-lld/README.md) | Detailed design, prediction, retrieval, agent and runtime specifications |
 
 **Implementation rule:** independent module teams start after the Integration Owner publishes compiling shared contracts and verifies actual database migrations. Read [AGENTS.md](../AGENTS.md) and [contract-freeze guidance](90-lld/implementation-contract-freeze.md).
+
+## Agent-assisted implementation
+
+- [Team topology and ownership](00-governance/agent-team-topology.md) — four lean implementation streams, one integration owner and independent review.
+- [Agentic SDLC](80-delivery/agentic-sdlc.md) — issue → contract → test → PR → reviewer → merge.
+- [Test and business evaluation strategy](70-quality/implementation-test-strategy.md) — runnable and planned quality gates explicitly separated.
+- [VS Code + Codex workflow](80-delivery/codex-development-workflow.md) — local worktrees, optional cloud tasks and limitations.
+- [Task template](../agents/templates/implementation-task.md) — strict scope, contract versions and handoff.
