@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>wAInery.BuildingBlocks</AssemblyName>
+    <RootNamespace>wAInery.BuildingBlocks</RootNamespace>
+  </PropertyGroup>
+</Project>
