@@ -68,3 +68,7 @@ For the MVP use **VS Code + Codex in scoped Git worktrees**, not an uncontrolled
 - [Agent assignment template](agents/templates/implementation-task.md)
 
 **Current CI:** solution build and module reference graph. Compiling public business ports, real PostgreSQL migrations, integration tests and 30–50 expert scenarios are **next implementation work**, not existing functionality.
+
+## Git workflow for implementation teams
+
+**Trunk-based development:** `main` is the only permanent integration branch. One small, independently testable feature per short-lived branch/worktree; **fetch + rebase onto current `main`** before final tests/review; **squash merge** to keep history clean; delete merged branch and worktree. Do not begin long-lived per-module or `develop` branches. See [mandatory agent collaboration rules](docs/00-governance/trunk-based-collaboration.md), [SDLC](docs/80-delivery/agentic-sdlc.md) and [PR checklist](.github/pull_request_template.md).
