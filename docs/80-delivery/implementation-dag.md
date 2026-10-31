@@ -1,6 +1,6 @@
 # Parallel implementation DAG — planned agent work packages
 
-**Gate 3 proposal**, not permission to implement before approval. Independent agents own module internal paths; integration owner owns shared contracts, migrations bootstrap, host and CI. Preserve small fixed cost and quality-first scope.
+**Gate 3 accepted; Wave 0 not yet completed.** Architectural approval does not authorize work against unfrozen compile-time contracts. Independent agents own module internal paths; integration owner owns shared contracts, migrations bootstrap, host and CI. Preserve small fixed cost and quality-first scope.
 
 ```mermaid
 flowchart TD
