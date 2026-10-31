@@ -45,3 +45,9 @@ README scope, interface/DTO with version, consumer example, failure & idempotenc
 ## Implementation scaffold available
 
 A `wAInery.slnx` .NET 10 solution, loopback-only Host, eight module Contracts + implementation project pairs, ArchitectureChecks and local PostgreSQL Compose are now present on the monorepo bootstrap branch. This **does not complete Wave 0**: the business ports still require compiling DTO implementations, actual database migration tests and durable workflows. See [monorepo bootstrap](monorepo-bootstrap.md).
+
+## Implementation stream sizing and SDLC
+
+The eight modules are **bounded code/data owners, not eight teams that must run in parallel**. For the cost-constrained MVP, schedule four workstreams: Domain State (Vineyard+Winery), Data Acquisition (Connectivity+Observations+Weather), Knowledge & AI (Knowledge+AIExecution), and Decisions; one Integration Owner owns shared Contracts, Host, CI and migration assembly. Start with 1–2 active coding sessions, worktrees and narrow PRs, plus independent QA. This refines the Wave 1 parallel graph without changing bounded-context ownership.
+
+Read [team topology](../00-governance/agent-team-topology.md), [full SDLC](agentic-sdlc.md), [test strategy](../70-quality/implementation-test-strategy.md) and [Codex workflow](codex-development-workflow.md). Wave 0 remains incomplete until actual public contracts compile and PostgreSQL migration/replay tests run.
