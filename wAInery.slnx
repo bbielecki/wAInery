@@ -5,6 +5,9 @@
   <Folder Name="/Host/">
     <Project Path="src/Host/wAInery.Host.csproj" />
   </Folder>
+  <Folder Name="/Persistence/">
+    <Project Path="src/Persistence/wAInery.Persistence.csproj" />
+  </Folder>
   <Folder Name="/Modules/">
     <Project Path="src/Modules/Vineyard/Contracts/wAInery.Modules.Vineyard.Contracts.csproj" />
     <Project Path="src/Modules/Vineyard/wAInery.Modules.Vineyard.csproj" />
@@ -26,5 +29,6 @@
   <Folder Name="/Tests/">
     <Project Path="tests/Architecture/wAInery.ArchitectureChecks.csproj" />
     <Project Path="tests/Contracts/wAInery.Contracts.Tests.csproj" />
+    <Project Path="tests/Integration/wAInery.Integration.Tests.csproj" />
   </Folder>
 </Solution>

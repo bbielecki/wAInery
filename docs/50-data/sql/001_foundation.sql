@@ -1,6 +1,7 @@
 -- wAInery LLD v1 — reference PostgreSQL 16+ schema. Reviewed design blueprint,
--- NOT yet applied or integration-tested against a live PostgreSQL instance.
--- Run once using a dedicated migration owner; use EF migrations for later changes.
+-- Historical design snapshot. Canonical executable migrations now live in
+-- src/Persistence/Migrations/ and are applied/tested through MigrationRunner.
+-- Do not execute this reference directly or edit published runtime migrations.
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE EXTENSION IF NOT EXISTS vector;
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
