@@ -9,6 +9,7 @@
     <PackageReference Include="xunit.v3" />
     <PackageReference Include="JsonSchema.Net" />
     <ProjectReference Include="../../src/BuildingBlocks/wAInery.BuildingBlocks.csproj" />
+    <ProjectReference Include="../../src/Modules/Weather/Contracts/wAInery.Modules.Weather.Contracts.csproj" />
     <Using Include="Xunit" />
   </ItemGroup>
 </Project>
