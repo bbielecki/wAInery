@@ -25,11 +25,33 @@ public sealed class ArchitectureBoundaryTests
             "src/Modules/Weather/Contracts/wAInery.Modules.Weather.Contracts.csproj",
             "src/Persistence/wAInery.Persistence.csproj");
         var result = await RunChecker(repository);
-        Assert.NotEqual(0, result.ExitCode);
+        Assert.Equal(1, result.ExitCode);
+        Assert.StartsWith("FAIL:", result.Error);
         var diagnostic = result.Output + result.Error;
         Assert.Contains("contract", diagnostic, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("wAInery.Persistence.csproj", diagnostic);
         Assert.Contains("wAInery.Modules.Weather.Contracts.csproj", diagnostic);
+    }
+
+    [Fact]
+    public async Task Module_cannot_reference_another_modules_implementation()
+    {
+        using var repository = SyntheticRepository.Create();
+        repository.AddReference("src/Modules/Weather/wAInery.Modules.Weather.csproj",
+            "src/Modules/Vineyard/wAInery.Modules.Vineyard.csproj");
+        var result = await RunChecker(repository);
+        Assert.Equal(1, result.ExitCode);
+        Assert.Contains("cross-module implementation", result.Error);
+    }
+
+    [Fact]
+    public async Task Project_reference_cycle_is_rejected()
+    {
+        using var repository = SyntheticRepository.Create();
+        repository.AddReference("src/BuildingBlocks/wAInery.BuildingBlocks.csproj", "src/Host/wAInery.Host.csproj");
+        var result = await RunChecker(repository);
+        Assert.Equal(1, result.ExitCode);
+        Assert.Contains("cycle", result.Error);
     }
 
     private sealed record CheckerResult(int ExitCode, string Output, string Error);

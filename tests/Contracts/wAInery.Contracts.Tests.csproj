@@ -6,6 +6,7 @@
     <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="../Architecture/wAInery.ArchitectureChecks.csproj" ReferenceOutputAssembly="false" />
     <PackageReference Include="xunit.v3" />
     <PackageReference Include="JsonSchema.Net" />
     <ProjectReference Include="../../src/BuildingBlocks/wAInery.BuildingBlocks.csproj" />
