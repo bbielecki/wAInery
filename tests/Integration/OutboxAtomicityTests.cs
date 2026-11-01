@@ -218,6 +218,42 @@ public sealed class OutboxAtomicityTests(PostgresFixture fixture) : IClassFixtur
         Assert.False(await reader.ReadAsync(Ct));
     }
 
+    [Fact]
+    public async Task Event_timestamp_columns_and_payload_share_PostgreSQL_microsecond_precision()
+    {
+        var connectionString = await CreateDatabase();
+        var change = Change() with
+        {
+            EffectiveAt = At.AddTicks(17),
+            OccurredAt = At.AddTicks(27),
+            RecordedAt = At.AddTicks(37),
+            TimeRange = new TimeWindow(At.AddTicks(47), At.AddHours(1).AddTicks(57))
+        };
+        await using var connection = new NpgsqlConnection(connectionString);
+        await connection.OpenAsync(Ct);
+        await using (var transaction = await connection.BeginTransactionAsync(Ct))
+        {
+            await InsertCanonical(connection, transaction);
+            await OutboxWriter.AppendAsync(connection, transaction, Metadata(), change, Ct);
+            await transaction.CommitAsync(Ct);
+        }
+        await using var command = new NpgsqlCommand("""
+            SELECT payload::text,effective_at,occurred_at,recorded_at
+            FROM processing.outbox
+            """, connection);
+        await using var reader = await command.ExecuteReaderAsync(Ct);
+        Assert.True(await reader.ReadAsync(Ct));
+        var consumed = DomainChangeV1Json.Deserialize(reader.GetString(0));
+        Assert.Equal(At.AddTicks(10), consumed.EffectiveAt);
+        Assert.Equal(At.AddTicks(20), consumed.OccurredAt);
+        Assert.Equal(At.AddTicks(30), consumed.RecordedAt);
+        Assert.Equal(reader.GetFieldValue<DateTimeOffset>(1), consumed.EffectiveAt);
+        Assert.Equal(reader.GetFieldValue<DateTimeOffset>(2), consumed.OccurredAt);
+        Assert.Equal(reader.GetFieldValue<DateTimeOffset>(3), consumed.RecordedAt);
+        Assert.Equal(change.TimeRange, consumed.TimeRange);
+        Assert.False(await reader.ReadAsync(Ct));
+    }
+
     private async Task<string> CreateDatabase()
     {
         var connectionString = await fixture.CreateDatabaseAsync(Ct);
