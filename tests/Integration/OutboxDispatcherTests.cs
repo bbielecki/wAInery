@@ -278,6 +278,27 @@ public sealed class OutboxDispatcherTests(PostgresFixture fixture) : IClassFixtu
     }
 
     [Fact]
+    public async Task Already_exhausted_pending_event_is_dead_without_another_consumer_attempt()
+    {
+        await using var source = await PrepareDatabase();
+        var change = await SeedEvent(source);
+        await using (var connection = await source.OpenConnectionAsync(Ct))
+        await using (var setAttempt = new NpgsqlCommand("UPDATE processing.outbox SET attempts=6 WHERE id=@id", connection))
+        {
+            setAttempt.Parameters.AddWithValue("id", change.EventId);
+            await setAttempt.ExecuteNonQueryAsync(Ct);
+        }
+        Assert.True(await new PostgresOutboxDispatcher(source, [Probe("fixture-consumer")], maxAttempts: 5).DispatchOneAsync(Ct));
+        var state = await ReadState(source, change.EventId);
+        Assert.Equal(6, state.Attempts);
+        Assert.Equal("ATTEMPTS_EXHAUSTED", state.LastError);
+        Assert.NotNull(state.DeadAt);
+        Assert.Null(state.DeliveredAt);
+        await AssertCounts(source, effects: 0, inboxes: 0);
+        Assert.False(await new PostgresOutboxDispatcher(source, [Probe("fixture-consumer")], maxAttempts: 5).DispatchOneAsync(Ct));
+    }
+
+    [Fact]
     public async Task Cancellation_after_a_handler_write_rolls_back_and_propagates_without_retry_metadata()
     {
         await using var source = await PrepareDatabase();
@@ -299,6 +320,31 @@ public sealed class OutboxDispatcherTests(PostgresFixture fixture) : IClassFixtu
         Assert.Null(state.LastError);
         Assert.True(await new PostgresOutboxDispatcher(source, [Probe("fixture-consumer")]).DispatchOneAsync(Ct));
         await AssertCounts(source, effects: 1, inboxes: 1);
+    }
+
+    [Fact]
+    public async Task Consumer_local_cancellation_with_live_caller_is_a_bounded_failure()
+    {
+        await using var source = await PrepareDatabase();
+        var change = await SeedEvent(source);
+        var localTimeout = new SqlConsumer("fixture-consumer", async (evt, connection, transaction, ct) =>
+        {
+            await InsertEffect("fixture-consumer", evt, connection, transaction, ct);
+            throw new OperationCanceledException(PrivateMarker, new CancellationToken(canceled: true));
+        });
+        var dispatcher = new PostgresOutboxDispatcher(source, [localTimeout], maxAttempts: 1);
+        var processed = false;
+        var error = await Record.ExceptionAsync(async () => { processed = await dispatcher.DispatchOneAsync(Ct); });
+        Assert.Null(error);
+        Assert.True(processed);
+        Assert.False(Ct.IsCancellationRequested);
+        await AssertCounts(source, effects: 0, inboxes: 0);
+        var state = await ReadState(source, change.EventId);
+        Assert.Equal(1, state.Attempts);
+        Assert.NotNull(state.DeadAt);
+        Assert.Null(state.DeliveredAt);
+        Assert.Equal("CONSUMER_FAILURE", state.LastError);
+        Assert.DoesNotContain(PrivateMarker, state.LastError!);
     }
 
     private async Task<NpgsqlDataSource> PrepareDatabase()
