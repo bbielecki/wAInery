@@ -1,59 +1,22 @@
 # Verified engineering lessons
 
-Gate1 verified engineering lessons, curated by IO on2026-11-01. Evidence below is
-synthetic contract/actual PostgreSQL/process regression, not RAG quality, agronomic
-validity or production behavior. Architecture/contracts remain authoritative.
+Gate1 / IO + independent QA /2026-11-01. Synthetic tests, not business/scientific validation.
 
-### LES-2026-001 — Nullable does not define omitted JSON
+- **PG precision / BR-08/09:** normalize persisted timestamps before JSON; keep source TimeRange precision.
+  [PR26](https://github.com/bbielecki/wAInery/pull/26), [OutboxAtomicityTests](../../tests/Integration/OutboxAtomicityTests.cs):
+  `Event_timestamp_columns_and_payload_share_PostgreSQL_microsecond_precision`.
+- **Wrong database / BR-09/10:** valid connection+transaction can still target another DB; check configured host/port/database, never secrets/DNS guesses.
+  [PR29](https://github.com/bbielecki/wAInery/pull/29), [JobQueueTests](../../tests/Integration/JobQueueTests.cs):
+  `Caller_transaction_must_target_the_queues_configured_database` (two actual DBs).
+- **Cancellation / BR-09/10:** consumer-local OCE with live caller must consume bounded failure budget; caller cancellation rolls back without retry metadata. DB-only consumers; no exactly-once external I/O claim.
+  [PR33](https://github.com/bbielecki/wAInery/pull/33), [OutboxDispatcherTests](../../tests/Integration/OutboxDispatcherTests.cs):
+  `Consumer_local_cancellation_with_live_caller_is_a_bounded_failure`, `Cancellation_after_a_handler_write_rolls_back_and_propagates_without_retry_metadata`.
+- **Reload / BR-10:** one-time endpoint validation is bypassable if Kestrel reload stays enabled. Disable endpoint reload, retain startup guard; other settings may still reload.
+  [PR37](https://github.com/bbielecki/wAInery/pull/37), [HostReadinessTests](../../tests/Integration/HostReadinessTests.cs):
+  `Changed_endpoint_file_after_startup_cannot_add_a_listener` (actual second-loopback RED?GREEN).
 
-Verified / BB, all event owners / BR-08/09. Explicit null failed frozenv1 even
-though CLR field was nullable. Preserve omission vsnull deliberately at codec
-boundary. [PR13](https://github.com/bbielecki/wAInery/pull/13),
-[DomainChangeV1Tests](../../tests/Contracts/DomainChangeV1Tests.cs), exact regression
-`Optional_fields_cannot_be_explicit_null_in_v1`. Limit: other schemas may allow null.
-B DataAcquisition ACK; no new skill, schema/codec tests enforce this.
-
-### LES-2026-002 — Persisted timestamps need shared precision
-
-Verified / Persistence, event owners / BR-08/09. .NET100ns event values and PG
-microseconds diverged between JSON and columns. Normalize the three persisted
-timestamps before serialization; do not truncate arbitrary source TimeRange.
-[PR26](https://github.com/bbielecki/wAInery/pull/26),
-[OutboxAtomicityTests](../../tests/Integration/OutboxAtomicityTests.cs), exact
-`Event_timestamp_columns_and_payload_share_PostgreSQL_microsecond_precision`.
-B ACK; actual PG regression, no performance/savings claim or new skill.
-
-### LES-2026-003 — A valid transaction can target the wrong database
-
-Verified / Persistence, future job publishers / BR-09/10. Connection+transaction
-matching alone accepted a foreign DB. Check actual configured host/port/database
-before queue publication, without logging/comparing secrets. Deliberately no DNS
-alias equivalence guess. [PR29](https://github.com/bbielecki/wAInery/pull/29),
-[JobQueueTests](../../tests/Integration/JobQueueTests.cs), exact regression
-`Caller_transaction_must_target_the_queues_configured_database` uses two real DBs.
-B ACK; replay/lease handoff remains canonical. No new skill.
-
-### LES-2026-004 — Local OCE is not caller cancellation
-
-Verified / Persistence, DB-only outbox consumers / BR-09/10. Consumer-local OCE
-with live caller bypassed bounded retries. Roll back effects and record bounded
-failure unless caller actually cancelled. Caller cancellation propagates full
-rollback with no retry metadata. [PR33](https://github.com/bbielecki/wAInery/pull/33),
-[OutboxDispatcherTests](../../tests/Integration/OutboxDispatcherTests.cs), exact
-`Consumer_local_cancellation_with_live_caller_is_a_bounded_failure` and
-`Cancellation_after_a_handler_write_rolls_back_and_propagates_without_retry_metadata`.
-B ACK; this is not exactly-once external I/O. Deterministic tests, no new skill.
-
-### LES-2026-005 — Startup validation can be bypassed by reload
-
-Verified / Host / BR-10. Startup rejected endpoint overrides, but subsequent JSON
-reload added an unapproved listener. Disable Kestrel endpoint reload as well as
-validate initial config. [PR37](https://github.com/bbielecki/wAInery/pull/37),
-[HostReadinessTests](../../tests/Integration/HostReadinessTests.cs), exact regression
-`Changed_endpoint_file_after_startup_cannot_add_a_listener`: actual RED with second
-loopback HTTP listener, then GREEN after source fix. No public bind during RED.
-Limit: this is endpoint config, not a ban on every application setting reload.
-QA independently identified/reviewed, IO accepted. Test beats new instruction skill.
+Other findings stay in PR handoffs/tests. B/C received relevant interface lessons;
+ACK and reused skills: [Gate1](../handoffs/GATE-1-review.md). No new skill/savings claim.
 
 ## Entry template
 
