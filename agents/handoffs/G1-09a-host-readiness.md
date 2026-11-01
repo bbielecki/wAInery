@@ -41,8 +41,11 @@ python scripts/validate_agent_skills.py
 git diff --check
 ```
 
-Fresh-main final tests, independent qa_g1_01 review (not C or IO) and CI pending
-before squash. No owner handlers, weather, RAG, AI, plan evaluation or domain
+Fresh-main fetch/rebase then full173 PASS (73contract+100actualPG/process), no
+skipped, Releasebuild0/0, architecture22/schema/skills/whitespace PASS. Independent
+qa_g1_01 final staticreview READY FOR PR; both P1/P2 below closed, no openP0/P1/P2.
+Reviewer did not execute implementer's PG. PR CI pending before squash.
+No owner handlers, weather, RAG, AI, plan evaluation or domain
 operation E2E executed; not Gate1 claims. No privacy/rights/economic policy change.
 Independent review found startup-only endpoint guard can be bypassed by default
 Kestrel endpoint reload. New owned temp contentRoot test changed its own JSON after
@@ -54,7 +57,7 @@ Single-case GREEN after fix, actual1PASS. P2 added actual SQL exception coverage
 own disposable journal temporarily renamed, view/function raises synthetic private
 marker; ready503/live200 then restore→ready200, marker/password/connection/function
 absent from response/logs. Actual filtered1PASS; source catch already correct.
-Now15Host cases, final173/full rerun/review pending. Transferable lesson candidate: one-time configuration
+Now15Host cases, final173/full rerun PASS. Transferable lesson candidate: one-time configuration
 validation is insufficient if framework reload can change the validated resource.
 Existing verification skill reused. No new skill; deterministic regression is better.
 Final demo/learning/admin prerequisite/human Gate1 review remains issue34.
