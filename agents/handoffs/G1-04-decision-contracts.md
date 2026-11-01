@@ -32,8 +32,11 @@ historical schemas/skills/whitespace PASS. Independent review found command scop
 P1; two new cases reproduced runtimeRED70PASS/2FAIL (scope/UTC). New readonly
 constructors/scope-copy guards then72contracts PASS. Review P2 optional prerequisite
 arrays reproduced73cases72PASS/1FAIL; normalize default arrays to Empty both in
-initialization and with-init, followed73contracts PASS. Final158/full rerun and
-fresh-main CI pending before squash. Reviewer did not execute implementer's PG.
+initialization and with-init, followed73contracts PASS. After fresh-main fetch/rebase,
+full158 PASS (73contracts+85actualPG), no skipped, build0/0 andarchitecture22 PASS;
+schema/skill/whitespace validators PASS. Independent qa_g1_01 final static review
+READY FOR PR, no openP0/P1/P2, both findings closed. Reviewer did not execute
+implementer's PG. Final PR CI must pass before squash.
 
 ```powershell
 dotnet build wAInery.slnx --configuration Release --no-restore --verbosity quiet
