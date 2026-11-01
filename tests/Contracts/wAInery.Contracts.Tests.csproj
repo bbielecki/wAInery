@@ -10,6 +10,9 @@
     <PackageReference Include="JsonSchema.Net" />
     <ProjectReference Include="../../src/BuildingBlocks/wAInery.BuildingBlocks.csproj" />
     <ProjectReference Include="../../src/Modules/Weather/Contracts/wAInery.Modules.Weather.Contracts.csproj" />
+    <ProjectReference Include="../../src/Modules/Vineyard/Contracts/wAInery.Modules.Vineyard.Contracts.csproj" />
+    <ProjectReference Include="../../src/Modules/Winery/Contracts/wAInery.Modules.Winery.Contracts.csproj" />
+    <ProjectReference Include="../../src/Modules/Observations/Contracts/wAInery.Modules.Observations.Contracts.csproj" />
     <Using Include="Xunit" />
   </ItemGroup>
 </Project>
