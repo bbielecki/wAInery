@@ -102,6 +102,8 @@ public sealed class OutboxAtomicityTests(PostgresFixture fixture) : IClassFixtur
     [InlineData("canonical-identity")]
     [InlineData("wire-workspace")]
     [InlineData("event-producer")]
+    [InlineData("timestamp-minimum")]
+    [InlineData("timestamp-maximum")]
     public async Task Invalid_scope_or_canonical_identity_is_rejected_before_publication(string invalidPart)
     {
         var connectionString = await CreateDatabase();
@@ -115,6 +117,8 @@ public sealed class OutboxAtomicityTests(PostgresFixture fixture) : IClassFixtur
         if (invalidPart == "metadata-workspace") metadata = metadata with { Workspace = otherWorkspace };
         if (invalidPart == "canonical-identity") metadata = metadata with { InternalAggregateId = Guid.Empty };
         if (invalidPart == "event-producer") metadata = metadata with { Producer = "Vineyard" };
+        if (invalidPart == "timestamp-minimum") change = change with { EffectiveAt = DateTimeOffset.MinValue };
+        if (invalidPart == "timestamp-maximum") change = change with { EffectiveAt = DateTimeOffset.MaxValue };
         if (invalidPart == "wire-workspace") change = change with { Subject = change.Subject with { Workspace = otherWorkspace } };
         await Assert.ThrowsAnyAsync<ArgumentException>(() => OutboxWriter.AppendAsync(connection, transaction, metadata, change, Ct));
         await transaction.RollbackAsync(Ct);
