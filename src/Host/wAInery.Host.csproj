@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../BuildingBlocks/wAInery.BuildingBlocks.csproj" />
+    <ProjectReference Include="../Persistence/wAInery.Persistence.csproj" />
     <ProjectReference Include="../Modules/Vineyard/wAInery.Modules.Vineyard.csproj" />
     <ProjectReference Include="../Modules/Winery/wAInery.Modules.Winery.csproj" />
     <ProjectReference Include="../Modules/Decisions/wAInery.Modules.Decisions.csproj" />

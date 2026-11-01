@@ -11,6 +11,7 @@ permissions:
 jobs:
   build-and-boundaries:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - name: Install .NET 10
@@ -23,7 +24,7 @@ jobs:
         run: dotnet build wAInery.slnx --no-restore --configuration Release
       - name: Validate module reference boundaries
         run: dotnet run --project tests/Architecture/wAInery.ArchitectureChecks.csproj --no-restore --configuration Release
-      - name: Run deterministic contract tests
+      - name: Run deterministic contracts and real PostgreSQL integration tests
         run: dotnet test --solution wAInery.slnx --no-build --no-restore --configuration Release
       - uses: actions/setup-python@v5
         with:
