@@ -79,6 +79,8 @@ public sealed record PublishForecastRunCommand
 
 public interface IWeatherReadPort
 {
+    Task<Result<ResolvedSubject>> ResolveAsync(SubjectRef location, CancellationToken ct);
+    Task<Result<WeatherLocationDto>> GetLocationAsync(WorkspaceId workspace, string locationId, CancellationToken ct);
     Task<Result<WeatherWindowDto>> GetKnownForecastAsync(WorkspaceId workspace, string locationId,
         DateTimeOffset asOf, DateTimeOffset from, DateTimeOffset to, CancellationToken ct);
     Task<Result<ForecastDiffDto>> GetForecastDiffAsync(WorkspaceId workspace, string previousRunId,
