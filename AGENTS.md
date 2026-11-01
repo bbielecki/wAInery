@@ -37,9 +37,15 @@ Baseline commands:
 dotnet restore wAInery.slnx
 dotnet build wAInery.slnx --configuration Release
 dotnet run --project tests/Architecture/wAInery.ArchitectureChecks.csproj
+dotnet test --solution wAInery.slnx --configuration Release
 ```
 
-`dotnet test wAInery.slnx`, Testcontainers migration tests, RAG/AI evaluation and contract suites **must be added in later waves**. Do not claim they pass until executed. Ordinary CI must not require paid model calls, live weather endpoints or real private documents.
+Gate1 adds actual contract and PostgreSQL/process suites. This repository selects
+Microsoft.Testing.Platform: use `dotnet test --solution wAInery.slnx`, not a
+positional solution argument. RAG/AI/business evaluation remains later work.
+Do not claim any suite passes until executed. Ordinary CI must not require paid
+model calls, live weather endpoints or real private documents. Gate2 still requires
+explicit human APPROVE GATE 1; see agents/handoffs/GATE-1-review.md.
 
 ## Definition of agent handoff
 

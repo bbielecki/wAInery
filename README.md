@@ -1,7 +1,11 @@
 # wAInery — Smart Winery AI
 
 **Product:** local-first decision intelligence for growing grapes and making wine in Poland.  
-**Status:** Gates 1–3 (layout, domains, components) approved; Gate 4 LLD documented and architecture-reviewed, **not yet implemented or scientifically validated**. See the [business HLD](docs/10-architecture/business-hld.md) and [architecture assessment](docs/70-quality/architecture-review-2026-11.md).
+**Implementation status:** Gate1 technical foundation implemented with177 actual
+contract/PostgreSQL/process tests; human Gate1 review and admin main protection
+pending. The decision MVP and scientific evaluation are future work. Historical
+design-stage gate labels do not authorize implementation milestones. See
+[Gate1 review/demo](agents/handoffs/GATE-1-review.md) and [business HLD](docs/10-architecture/business-hld.md).
 
 ## Business HLD — what the product must do
 
@@ -37,7 +41,7 @@ One local **.NET 10 modular monolith + PostgreSQL/pgvector + private files**; pa
 - Expert-review **30–50 representative cases** for safe next action, time, multiple acceptable alternatives, citation grounding and Polish applicability; compare against cheaper baselines. **The goal is not yet measured.**
 - Test scoped recomputation, as-of forecast/operations replay, budget limits, idempotent restart and the absence of unnecessary LLM calls.
 - Private scanned books and derived content remain in protected local storage, outside Git. Source rights and external model egress policy apply before evidence leaves the computer; no public access required for MVP.
-- **Parallel implementation:** freeze compiled contracts and migration strategy (Wave 0), then seven independently owned modules (Wave 1), integrate Decisions and workflows (Wave 2–3). The [review](docs/70-quality/architecture-review-2026-11.md) records remaining Wave 0 blockers; no running solution is claimed.
+- **Parallel implementation:** compiled public contracts and actual migration/atomic outbox/lease tests now establish the technical foundation. Owner implementations and working weather→plan vertical remain future approved gates; see [delivery roadmap](agents/handoffs/GATE-0-plan.md).
 
 ## Documentation
 
@@ -46,15 +50,24 @@ Start with the [business HLD](docs/10-architecture/business-hld.md), [architectu
 
 ## Monorepo for implementation
 
-The repository now contains a .NET 10 [solution scaffold](wAInery.slnx) and a [local-first monorepo guide](docs/80-delivery/monorepo-bootstrap.md): 8 module contract assemblies, 8 isolated implementation projects, BuildingBlocks, one localhost Host, an architecture dependency check and local PostgreSQL/pgvector Compose. It is **not yet a running decision system**, nor have actual database migrations or agronomic evaluations been executed.
+The .NET10 [solution](wAInery.slnx) has22 projects: eight module Contracts and
+eight implementation shells, BuildingBlocks, Persistence, Host and three test
+projects. Public ports compile; four immutable/additive migrations run on actual
+PostgreSQL/pgvector. Atomic outbox/inbox dispatch and fenced durable jobs have
+real retry/rollback/concurrency tests. Host validates startup DB compatibility,
+binds loopback and exposes built-in live/ready. No domain command handler,
+prediction/ranking, RAG, model executor or agronomic evaluation implemented yet.
 
 ```bash
 dotnet restore wAInery.slnx
-dotnet build wAInery.slnx
-dotnet run --project tests/Architecture/wAInery.ArchitectureChecks.csproj
+dotnet build wAInery.slnx --configuration Release
+dotnet run --project tests/Architecture/wAInery.ArchitectureChecks.csproj --configuration Release
+dotnet test --solution wAInery.slnx --configuration Release
 ```
 
-See [Wave 0 blockers](docs/70-quality/architecture-review-2026-11.md) before assigning parallel module implementation.
+For reproducible synthetic demo and actual local startup commands see
+[Gate1 procedure](agents/handoffs/GATE-1-review.md) and [bootstrap](docs/80-delivery/monorepo-bootstrap.md).
+Implementation Gate2 requires explicit `APPROVE GATE 1`.
 
 ## How to implement with coding agents
 
@@ -67,7 +80,10 @@ For the MVP use **VS Code + Codex in scoped Git worktrees**, not an uncontrolled
 - [Codex IDE and Git worktrees](docs/80-delivery/codex-development-workflow.md)
 - [Agent assignment template](agents/templates/implementation-task.md)
 
-**Current CI:** solution build and module reference graph. Compiling public business ports, real PostgreSQL migrations, integration tests and 30–50 expert scenarios are **next implementation work**, not existing functionality.
+**Current CI:** restore/Release build, real positive/negative architecture CLI,
+contract and actual PostgreSQL/process integration suites, wire schemas/negative
+fixtures, skill validation and PR freshness. No paid model/live weather/private
+document dependency. 30–50 expert decision scenarios remain future Gate6 work.
 
 ## Git workflow for implementation teams
 
