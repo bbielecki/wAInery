@@ -1,9 +1,9 @@
 # Gate 0 — audyt i proponowany plan implementacji MVP
 
 Data: 2026-11-01, Europe/Warsaw. Autor: Architect / Integration Owner.
-Status: **PROPOSED — oczekuje na ludzki przegląd i `APPROVE GATE 0`.**
+Status: **APPROVED — użytkownik napisał `approve gate 0` dnia 2026-11-01. Autoryzowany jest wyłącznie Gate 1.**
 Śledzenie: [GitHub Issue #8](https://github.com/bbielecki/wAInery/issues/8).
-Ten plik jest lokalnym szkicem handoff, bez commitu i bez PR. Nie ustanawia nowych kontraktów ani zatwierdzonych zasad biznesowych.
+Plan zapisano w main przez właściciela w commicie a41a77c. Wyniki audytu poniżej są historycznym stanem Gate 0; aktualne dowody należą do Issues/PR Gate 1. Plan nie zmienia kontraktów ani zasad biznesowych.
 
 ## Zakres i źródła
 
@@ -214,5 +214,5 @@ Ze źródła oczekiwane status=ok, service=wAInery, phase=scaffold. Obecny Host 
 
 ## Zatrzymanie
 
-Gate 0 pozostaje do przeglądu użytkownika; nie było niezależnego review implementacji, bo implementacja nie powstała. Dokument nie jest samoakceptacją.
-Prośba o ocenę powyższego planu i zgodę **APPROVE GATE 0**. Dopiero wtedy można rozpocząć Gate 1; Gate 2 pozostaje zablokowany do APPROVE GATE 1.
+Gate 0 zatwierdził użytkownik dnia 2026-11-01 wiadomością `approve gate 0`. W Gate 0 nie było review implementacji, bo implementacja nie powstała.
+Można realizować Gate 1. Gate 2 pozostaje zablokowany do APPROVE GATE 1; CI ani merge nie zastępują tej zgody.
