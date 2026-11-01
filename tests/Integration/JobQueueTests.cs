@@ -46,6 +46,29 @@ public sealed class JobQueueTests(PostgresFixture fixture) : IClassFixture<Postg
         Assert.Equal("PENDING", (await State(dataSource)).Status);
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Caller_transaction_must_target_the_queues_configured_database(bool complete)
+    {
+        await using var configured = await PreparedDatabase();
+        await using var other = await PreparedDatabase();
+        var queue = new PostgresJobQueue(configured);
+        var otherQueue = new PostgresJobQueue(other);
+        await Enqueue(other, otherQueue, Request(1));
+        var lease = await Claim(otherQueue);
+        await using var connection = await other.OpenConnectionAsync(Ct);
+        await using var transaction = await connection.BeginTransactionAsync(Ct);
+        if (complete)
+            await Assert.ThrowsAsync<ArgumentException>(() => queue.CompleteAsync(connection, transaction, lease, Ct));
+        else
+            await Assert.ThrowsAsync<ArgumentException>(() => queue.EnqueueAsync(connection, transaction, Request(2), Ct));
+        await transaction.RollbackAsync(Ct);
+        Assert.Equal(0L, await Scalar<long>(configured, "SELECT count(*) FROM processing.jobs"));
+        Assert.Equal("RUNNING", (await State(other)).Status);
+        Assert.Equal(1L, (await State(other)).Revision);
+    }
+
     [Fact]
     public async Task Pending_updates_preserve_earliest_schedule_and_highest_urgency()
     {
@@ -153,7 +176,7 @@ public sealed class JobQueueTests(PostgresFixture fixture) : IClassFixture<Postg
         var claims = await Task.WhenAll(
             queue.ClaimAsync("worker-A", LeaseDuration, Ct),
             queue.ClaimAsync("worker-B", LeaseDuration, Ct));
-        Assert.Single(claims.Where(claim => claim is not null));
+        Assert.Single(claims, claim => claim is not null);
     }
 
     [Fact]
