@@ -1,5 +1,9 @@
 # wAInery — instructions for coding agents (Codex / other coding assistants)
 
+Prioritize business code, meaningful tests and independent review. Keep design/
+architecture docs stable; update only changed contracts, decisions or run commands.
+Use Issues/PRs for progress and one concise milestone handoff; avoid duplicated reports.
+
 **Read this before editing any file.** You are contributing to a **.NET 10 modular monolith** in a monorepo, not implementing the runtime winery AI agent platform. The repo's business contract is [Business HLD](docs/10-architecture/business-hld.md); delivery rules are [Agentic SDLC](docs/80-delivery/agentic-sdlc.md). The [team topology](docs/00-governance/agent-team-topology.md), [test strategy](docs/70-quality/implementation-test-strategy.md), [Codex guide](docs/80-delivery/codex-development-workflow.md) and [engineering learning policy](docs/00-governance/agent-learning-and-skills.md) are mandatory for implementation tasks.
 
 ## Mission — do not lose the business goal
@@ -37,9 +41,15 @@ Baseline commands:
 dotnet restore wAInery.slnx
 dotnet build wAInery.slnx --configuration Release
 dotnet run --project tests/Architecture/wAInery.ArchitectureChecks.csproj
+dotnet test --solution wAInery.slnx --configuration Release
 ```
 
-`dotnet test wAInery.slnx`, Testcontainers migration tests, RAG/AI evaluation and contract suites **must be added in later waves**. Do not claim they pass until executed. Ordinary CI must not require paid model calls, live weather endpoints or real private documents.
+Gate1 adds actual contract and PostgreSQL/process suites. This repository selects
+Microsoft.Testing.Platform: use `dotnet test --solution wAInery.slnx`, not a
+positional solution argument. RAG/AI/business evaluation remains later work.
+Do not claim any suite passes until executed. Ordinary CI must not require paid
+model calls, live weather endpoints or real private documents. Gate2 still requires
+explicit human APPROVE GATE 1; see agents/handoffs/GATE-1-review.md.
 
 ## Definition of agent handoff
 

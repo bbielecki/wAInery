@@ -12,7 +12,10 @@ Skill files are **reusable coding-agent instructions**, not product features and
 
 **Candidate → Scoped draft → Tested → Architect-approved → Published → Observed → Revised or Retired.** Skill metadata must have `name` and concise `description` defining trigger. It must explicitly say when not to use it, inputs, deterministic steps, expected outputs and stop conditions. Add scripts only when repeated manual commands are error-prone and a test proves the script reliable.
 
-Current three starter skills **codify already agreed repository workflows**; they are not evidence that the implementation teams have already learned from completed code changes.
+Gate1 reused all three skills in reviewed PRs; actual findings are in
+[verified lessons](lessons.md) and [Gate1 handoff](../handoffs/GATE-1-review.md).
+No new skill adopted or retired. Repetition is covered by existing skills and
+deterministic contract/architecture/SQL regressions; benefit savings unmeasured.
 
 Do not create a new skill just because two tasks share a filename. Architect checks the repository and existing skills for duplication, coherence with HLD/ADR, measurable benefit and need for tests. Re-evaluate a skill when the linked contracts, tooling or release process changes.
 

@@ -1,6 +1,9 @@
-# Monorepo bootstrap — implementation layout (Wave 0 scaffold)
+# Monorepo bootstrap — Gate1 technical foundation
 
-**Status:** file/project scaffold only. A successful build does not prove that shared read ports, actual Postgres migrations or business decision rules have been implemented. See [Business HLD](../10-architecture/business-hld.md), [Architecture Review](../70-quality/architecture-review-2026-11.md) and [contract freeze](../90-lld/implementation-contract-freeze.md).
+**Status:** compiled ports, actual migrations/outbox/jobs/Host foundation tested;
+human Gate1 review/admin protection pending. Working business decision vertical
+and scientific validation remain later gates. [Current evidence/startup/demo](../../agents/handoffs/GATE-1-review.md)
+separates actual behavior from [Business HLD](../10-architecture/business-hld.md) target design.
 
 ## Structure
 
@@ -11,6 +14,7 @@ Directory.Packages.props
 global.json
 src/
   BuildingBlocks/        # stable cross-module value objects; Integration Owner
+  Persistence/           # IO migrations, atomic outbox/inbox, durable leases
   Host/                  # single localhost ASP.NET Core host and composition root
   Modules/
     Vineyard/
@@ -25,8 +29,8 @@ src/
     AIExecution/
 tests/
   Architecture/          # dependency graph smoke check, no external NuGet packages
-  Contracts/             # future wire-schema tests
-  Integration/           # future Testcontainers PostgreSQL migration and outbox tests
+  Contracts/             # actual DTO/wire and architecture CLI regression tests
+  Integration/           # actual Testcontainers SQL and child Host tests
   Modules/               # module-owned unit/integration tests
   Evaluation/            # 30–50 reviewed business scenarios + replay/baselines
 infra/local/compose.yaml # loopback-only PostgreSQL + pgvector
@@ -39,14 +43,15 @@ Each module has a **Contracts project** and a **single implementation project**.
 ```bash
 dotnet restore wAInery.slnx
 dotnet build wAInery.slnx --configuration Release
-dotnet run --project tests/Architecture/wAInery.ArchitectureChecks.csproj
-cp infra/local/.env.example infra/local/.env
-docker compose --env-file infra/local/.env -f infra/local/compose.yaml up -d
-dotnet run --project src/Host/wAInery.Host.csproj
-# http://127.0.0.1:5100/health/live
+dotnet run --project tests/Architecture/wAInery.ArchitectureChecks.csproj --configuration Release
+dotnet test --solution wAInery.slnx --configuration Release
 ```
 
-**Prerequisites:** .NET 10 SDK and Docker/Podman with Compose. Replace the example PostgreSQL password before use. No weather provider or AI API key is needed for structural build. The Host exposes only a loopback health route. It does **not** connect to the database or run an agent yet.
+**Prerequisites:** .NET10 SDK, Linux Docker engine (validated with Docker Desktop)
+and Compose for manual local DB. Testcontainers integration uses disposable DBs;
+no paid model/weather API or private document. [Exact PowerShell startup](../../agents/handoffs/GATE-1-review.md)
+sets secret locally, explicitly migrates then starts loopback live/ready.
+Normal Host connects and validates journal/extensions; it never auto-migrates.
 
 The repository's `NuGet.Config` selects nuget.org explicitly and maps all packages
 to that source. Personal feeds are not inherited, so Central Package Management
@@ -63,19 +68,20 @@ attributes again inside the parent module.
 
 - Integration Owner alone changes `wAInery.slnx`, `src/BuildingBlocks/**`, `src/Host/**`, root properties, CI, `contracts/**`, `infra/**`, initial migration assembly and shared test fixtures.
 - Each module agent owns `src/Modules/<Module>/**` and `tests/Modules/<Module>/**` only.
-- A module implementation can reference its own Contracts and external **Contracts**, not another module implementation. A module's Contracts assembly can reference BuildingBlocks, not other modules.
+- A module implementation can reference its own Contracts and external **Contracts**, not another module implementation. A module's Contracts assembly can reference only exact BuildingBlocks project, including no Persistence reference; actual negative CLI tests enforce this.
 - Host is composition root; `Decisions` calls `AIExecution` behind the **Decisions-owned** reasoning contract; only Host wires it.
-- SQL in `docs/50-data/sql/001_foundation.sql` is **reference design** and has not been applied. PostgreSQL schema owners submit migrations to Integration Owner; no concurrent mutation of shared DDL.
+- SQL in docs/50-data/sql is reference design. Compiled immutable history under src/Persistence/Migrations is authoritative for execution; four migrations verified on actual PG, including upgrade/rollback. Never edit published migration bodies. IO owns shared DDL.
 - Public subject/source identifiers remain opaque strings and map to internal UUIDs in owner modules. No leakage of EF entities between contexts.
 
-## Remaining Wave 0 gates (do not report as complete)
+## Current evidence and remaining business gates
 
-1. Freeze and compile the actual public ports/DTOs from LLD; ensure source and JSON fixture compatibility.
-2. Introduce migration runner and run initial migration against real PostgreSQL+pgvector via Testcontainers; test prediction-definition versions and occupancy exclusion constraints.
-3. Implement canonical entity write + same-transaction outbox, inbox deduplication, restart/replay and workspace checks.
-4. Build a **working** vertical weather → scoped invalidation → local plan report; record tokens/cost and verify zero AI on irrelevant changes.
-5. Add reviewed real/synthetic evaluation fixtures and ownership/rights tests. A running skeleton does not meet the business acceptance gate.
+1. Gate1 compiled owner/advice/evidence/storage ports and v1 fixtures, actual migration/integrity/outbox/inbox/job/Host tests are present. No actual domain command writes yet: atomic synthetic publication proves the infrastructure seam.
+2. Independent reviews and green PR checks recorded; admin-enforced main protection remains external human action. Human Gate1 approval required before implementation Gate2.
+3. Later: working Weather→scoped invalidation→plan/report, confirmed domain commands, current rights/egress and cost enforcement,30–50 reviewed business scenarios. See approved [roadmap/DAG](../../agents/handoffs/GATE-0-plan.md); technical health is not business acceptance.
 
 ## Why monorepo without Nx or a broker?
 
-For a single local host and eight logical modules, .NET solution/project reference boundaries are sufficient. No Nx plugin, orchestrator service, Kubernetes, Kafka or RabbitMQ is necessary in MVP. GitHub Actions compiles the solution and the architecture check scans project references. Later CI can use path-based test selection and cached restore after the test suite creates a measured bottleneck.
+For a single local host and eight logical modules, .NET solution/project boundaries
+are sufficient. CI also runs actual contract/SQL/process/negative graph suites and
+wire/skill validators. No additional orchestration service/broker needed. Optimize
+test selection only after a measured bottleneck.
