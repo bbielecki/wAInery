@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Collections.Immutable;
 using Json.Schema;
 using wAInery.BuildingBlocks;
 using wAInery.Modules.Decisions.Contracts;
@@ -251,6 +252,47 @@ public sealed class DecisionContractsTests
         return new(key, document.RootElement, "synthetic-observation", "Cel", classification);
     }
 
+    [Fact]
+    public void Decision_commands_reject_scope_from_another_workspace_or_target()
+    {
+        var context = new CommandContext(Workspace, "decision-fixture", Guid.NewGuid(), "synthetic-owner");
+        var foreignWorkspace = new WorkspaceId(Guid.NewGuid());
+        var foreign = new DecisionScope(foreignWorkspace, Block with { Workspace = foreignWorkspace },
+            "frost", "v1", new(AsOf, AsOf.AddDays(1)));
+        var wrongTarget = new DecisionScope(Workspace, Block with { Id = "other-block-fixture" },
+            "frost", "v1", new(AsOf, AsOf.AddDays(1)));
+        Assert.ThrowsAny<ArgumentException>(() => new RecomputePredictionCommand(context, foreign, AsOf, "fixture"));
+        Assert.ThrowsAny<ArgumentException>(() => new BuildDecisionPlanCommand(context, Block, [foreign], AsOf));
+        Assert.ThrowsAny<ArgumentException>(() => new BuildDecisionPlanCommand(context, Block, [wrongTarget], AsOf));
+    }
+
+    [Fact]
+    public void Build_command_copies_its_scopes_and_normalizes_time()
+    {
+        var context = new CommandContext(Workspace, "decision-fixture", Guid.NewGuid(), "synthetic-owner");
+        var scope = new DecisionScope(Workspace, Block, "frost", "v1", new(AsOf, AsOf.AddDays(1)));
+        var scopes = new List<DecisionScope> { scope };
+        var build = new BuildDecisionPlanCommand(context, Block, scopes, AsOf);
+        scopes.Clear();
+        Assert.Equal(scope, Assert.Single(build.Scopes));
+        Assert.Equal(TimeSpan.Zero, build.AsOf.Offset);
+    }
+
+    [Fact]
+    public void Optional_prerequisites_are_safe_empty_collections()
+    {
+        var proposal = new AdviceActionCandidate("action-fixture", ActionType.OBSERVE, "Inspect synthetic block", [],
+            EvidenceConfidence.UNKNOWN, false);
+        var plan = new PlanActionDto("action-fixture", ActionType.OBSERVE, "Inspect synthetic block", [],
+            EvidenceConfidence.UNKNOWN, Feasibility.FEASIBLE, false);
+        Assert.False(proposal.PrerequisiteCandidateIds.IsDefault);
+        Assert.False(plan.PrerequisiteActionIds.IsDefault);
+        Assert.Empty(proposal.PrerequisiteCandidateIds);
+        Assert.Empty(plan.PrerequisiteActionIds);
+        Assert.Empty((proposal with { PrerequisiteCandidateIds = default }).PrerequisiteCandidateIds);
+        Assert.Empty((plan with { PrerequisiteActionIds = default }).PrerequisiteActionIds);
+    }
+
     private static AgentAdviceRequest Request(IEnumerable<SourceVersionRef>? sourceVersions = null,
         IEnumerable<string>? evidence = null, IEnumerable<AdviceFact>? facts = null, IEnumerable<AdviceTool>? tools = null,
         int input = 1, int output = 1, decimal cost = 0m, int timeout = 1000,
@@ -269,7 +311,8 @@ public sealed class DecisionContractsTests
     private static bool SchemaAccepts(string relativePath, JsonNode instance)
     {
         using var schemaDocument = JsonDocument.Parse(File.ReadAllText(RepoFile(relativePath)));
-        return JsonSchema.Build(schemaDocument.RootElement).Evaluate(JsonSerializer.SerializeToElement(instance)).IsValid;
+        var schema = JsonSchema.Build(schemaDocument.RootElement, new BuildOptions { SchemaRegistry = new SchemaRegistry() });
+        return schema.Evaluate(JsonSerializer.SerializeToElement(instance)).IsValid;
     }
 
     private static string RepoFile(string path)

@@ -2,7 +2,8 @@
 
 Issue [#30](https://github.com/bbielecki/wAInery/issues/30), Gate 1 #10; BR-01/03/04/09/10.
 Owner Decisions / phase analyst `/root/stream_b_connectivity`; freeze owner IO.
-Status Proposed; base `69780c7`; application API cost 0. This file only changes.
+Status IO accepted for freeze #30; compiled Contracts authoritative after merge.
+Proposal base `69780c7`; application API cost 0. Historical analysis follows.
 No source/tests/migration/pricing changes or inference/ranking implementation.
 
 References: [Decisions](../../docs/30-components/Decisions.md),

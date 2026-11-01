@@ -16,6 +16,7 @@
     <ProjectReference Include="../../src/Modules/Knowledge/Contracts/wAInery.Modules.Knowledge.Contracts.csproj" />
     <ProjectReference Include="../../src/Modules/Connectivity/Contracts/wAInery.Modules.Connectivity.Contracts.csproj" />
     <ProjectReference Include="../../src/Modules/AIExecution/Contracts/wAInery.Modules.AIExecution.Contracts.csproj" />
+    <ProjectReference Include="../../src/Modules/Decisions/Contracts/wAInery.Modules.Decisions.Contracts.csproj" />
     <Using Include="Xunit" />
   </ItemGroup>
 </Project>
