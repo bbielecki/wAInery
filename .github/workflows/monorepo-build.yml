@@ -23,6 +23,15 @@ jobs:
         run: dotnet build wAInery.slnx --no-restore --configuration Release
       - name: Validate module reference boundaries
         run: dotnet run --project tests/Architecture/wAInery.ArchitectureChecks.csproj --no-restore --configuration Release
+      - name: Run deterministic contract tests
+        run: dotnet test --solution wAInery.slnx --no-build --no-restore --configuration Release
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate all wire schemas and synthetic examples
+        run: |
+          python3 -m pip install --isolated --index-url https://pypi.org/simple -r tools/requirements-contracts.txt
+          python3 tools/validate-gate3-contracts.py
 
       - name: Validate shared Codex skills (including negative fixture)
         run: python3 scripts/validate_agent_skills.py
