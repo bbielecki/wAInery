@@ -48,6 +48,17 @@ dotnet run --project src/Host/wAInery.Host.csproj
 
 **Prerequisites:** .NET 10 SDK and Docker/Podman with Compose. Replace the example PostgreSQL password before use. No weather provider or AI API key is needed for structural build. The Host exposes only a loopback health route. It does **not** connect to the database or run an agent yet.
 
+The repository's `NuGet.Config` selects nuget.org explicitly and maps all packages
+to that source. Personal feeds are not inherited, so Central Package Management
+works without changing global configuration or suppressing NU1507. See
+[contract validation](../../tools/README.md#contract-validation) for its isolated
+Python environment.
+
+Shared build settings exclude nested `Contracts/**`, `bin` and `obj` items from
+the implementation project's default source glob. Contracts compile in their
+own projects; repeated builds must not compile their generated assembly
+attributes again inside the parent module.
+
 ## Ownership, dependency direction and contract freeze
 
 - Integration Owner alone changes `wAInery.slnx`, `src/BuildingBlocks/**`, `src/Host/**`, root properties, CI, `contracts/**`, `infra/**`, initial migration assembly and shared test fixtures.
