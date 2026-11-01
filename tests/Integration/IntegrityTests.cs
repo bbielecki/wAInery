@@ -26,7 +26,7 @@ public sealed class IntegrityTests(PostgresFixture fixture) : IClassFixture<Post
         var original = Guid.NewGuid();
         await Record(connection, "vineyard", WorkspaceA, original, null);
         await Record(connection, "vineyard", WorkspaceA, Guid.NewGuid(), original);
-        Assert.Equal(1, await new MigrationRunner().ApplyAsync(connectionString, Ct));
+        Assert.Equal(MigrationRunner.BuiltInMigrations.Count - 1, await new MigrationRunner().ApplyAsync(connectionString, Ct));
         await using var count = new NpgsqlCommand("SELECT count(*) FROM vineyard.operations", connection);
         Assert.Equal(2L, await count.ExecuteScalarAsync(Ct));
     }
