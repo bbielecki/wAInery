@@ -7,6 +7,7 @@ namespace wAInery.Integration.Tests;
 public sealed class MigrationTests(PostgresFixture fixture) : IClassFixture<PostgresFixture>
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;
+    private static int MigrationCount => MigrationRunner.BuiltInMigrations.Count;
 
     [Fact]
     public async Task Host_migration_command_applies_and_then_replays_without_secret_output()
@@ -14,7 +15,7 @@ public sealed class MigrationTests(PostgresFixture fixture) : IClassFixture<Post
         var connectionString = await fixture.CreateDatabaseAsync(Ct);
         var first = await RunHost(connectionString);
         Assert.Equal(0, first.ExitCode);
-        Assert.Contains("Applied 1 migration(s).", first.Output);
+        Assert.Contains($"Applied {MigrationCount} migration(s).", first.Output);
         var second = await RunHost(connectionString);
         Assert.Equal(0, second.ExitCode);
         Assert.Contains("Applied 0 migration(s).", second.Output);
@@ -48,7 +49,7 @@ public sealed class MigrationTests(PostgresFixture fixture) : IClassFixture<Post
     {
         var connectionString = await fixture.CreateDatabaseAsync(Ct);
         var runner = new MigrationRunner();
-        Assert.Equal(1, await runner.ApplyAsync(connectionString, Ct));
+        Assert.Equal(MigrationCount, await runner.ApplyAsync(connectionString, Ct));
         Assert.Equal(0, await runner.ApplyAsync(connectionString, Ct));
         await using var connection = new NpgsqlConnection(connectionString);
         await connection.OpenAsync(Ct);
@@ -62,7 +63,7 @@ public sealed class MigrationTests(PostgresFixture fixture) : IClassFixture<Post
     {
         var connectionString = await fixture.CreateDatabaseAsync(Ct);
         var results = await Task.WhenAll(new MigrationRunner().ApplyAsync(connectionString, Ct), new MigrationRunner().ApplyAsync(connectionString, Ct));
-        Assert.Equal(new[] { 0, 1 }, results.Order().ToArray());
+        Assert.Equal(new[] { 0, MigrationCount }, results.Order().ToArray());
     }
 
     [Fact]
@@ -70,9 +71,10 @@ public sealed class MigrationTests(PostgresFixture fixture) : IClassFixture<Post
     {
         var connectionString = await fixture.CreateDatabaseAsync(Ct);
         await new MigrationRunner().ApplyAsync(connectionString, Ct);
-        var original = Assert.Single(MigrationRunner.BuiltInMigrations);
+        var original = MigrationRunner.BuiltInMigrations[0];
         var changed = original with { Sql = original.Sql + "\n-- changed payload" };
-        await Assert.ThrowsAsync<InvalidOperationException>(() => new MigrationRunner([changed]).ApplyAsync(connectionString, Ct));
+        var catalog = MigrationRunner.BuiltInMigrations.Select(migration => migration.Version == original.Version ? changed : migration);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => new MigrationRunner(catalog).ApplyAsync(connectionString, Ct));
         Assert.Equal(0, await new MigrationRunner().ApplyAsync(connectionString, Ct));
     }
 
@@ -81,14 +83,14 @@ public sealed class MigrationTests(PostgresFixture fixture) : IClassFixture<Post
     {
         var connectionString = await fixture.CreateDatabaseAsync(Ct);
         await new MigrationRunner().ApplyAsync(connectionString, Ct);
-        var broken = new SqlMigration(2, "002_broken.sql", "CREATE TABLE processing.rollback_probe(id int); SELECT 1/0;");
+        var broken = new SqlMigration(MigrationCount + 1, $"{MigrationCount + 1:D3}_broken.sql", "CREATE TABLE processing.rollback_probe(id int); SELECT 1/0;");
         var runner = new MigrationRunner(MigrationRunner.BuiltInMigrations.Append(broken));
         var error = await Assert.ThrowsAsync<PostgresException>(() => runner.ApplyAsync(connectionString, Ct));
         Assert.Equal(PostgresErrorCodes.DivisionByZero, error.SqlState);
         await using var connection = new NpgsqlConnection(connectionString);
         await connection.OpenAsync(Ct);
         Assert.True(await Scalar<bool>(connection, "SELECT to_regclass('processing.rollback_probe') IS NULL"));
-        Assert.Equal(1L, await Scalar<long>(connection, "SELECT count(*) FROM processing.schema_migrations"));
+        Assert.Equal((long)MigrationCount, await Scalar<long>(connection, "SELECT count(*) FROM processing.schema_migrations"));
     }
 
     [Fact]
