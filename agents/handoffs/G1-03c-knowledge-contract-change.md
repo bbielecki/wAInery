@@ -1,5 +1,8 @@
 # G1-03c Knowledge contract-change proposal
 
+IO accepted for freeze issue27. Compiled Contracts become authoritative; this
+document preserves the reviewed proposal and future owner test scenarios.
+
 Issue #23, Gate 1 #10; Stream C / Knowledge owner; BR-01/02/09/10.
 Status: PROPOSED to Architect / Integration Owner, not frozen or implemented.
 Branch: `agent/knowledge/g1-03c-contract-proposal`; API/model cost: 0.

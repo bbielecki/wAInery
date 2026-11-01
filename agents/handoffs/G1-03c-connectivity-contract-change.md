@@ -3,7 +3,8 @@
 Issue [#22](https://github.com/bbielecki/wAInery/issues/22), milestone #10; BR-08/09/10
 (and source extensibility BR-06). Owner: Stream B / Connectivity; author session
 `/root/stream_b_connectivity`; Architect / Integration Owner decides the freeze.
-Status: Proposed, not compiling public contracts or implemented behavior.
+Status: IO accepted for freeze issue27. Compiled Contracts become authoritative;
+this document preserves the reviewed proposal and future owner test scenarios.
 Application API cost: 0. Scope is this handoff only; no source, schema, fixtures,
 shared knowledge or provider settings changed. Base: `281ec1d`.
 

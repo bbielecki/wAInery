@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using wAInery.BuildingBlocks;
 using wAInery.Modules.Knowledge.Contracts;
+using wAInery.Modules.Connectivity.Contracts;
 
 namespace wAInery.Contracts.Tests;
 
@@ -160,5 +161,37 @@ public sealed class EvidenceContractsTests
     {
         Assert.ThrowsAny<ArgumentException>(() => new KnowledgeQuery(Workspace, Context, "fixture", (EvidencePurpose)999, At, 5, 1024));
         Assert.ThrowsAny<ArgumentException>(() => new KnowledgeQuery(Workspace, Context, " ", EvidencePurpose.LocalOwnerAnalysis, At, 5, 1024));
+    }
+
+    [Fact]
+    public void Registration_defaults_to_deny_and_receipt_cannot_reference_a_foreign_object()
+    {
+        var context = new CommandContext(Workspace, "receipt-fixture", Guid.NewGuid(), "synthetic-owner");
+        var source = new RegisterSourceCommand(context, "source-fixture-A", "MANUAL", "synthetic",
+            "fixture", "1", "1", "config-fixture", SourceRightsClass.PublicReference, null);
+        Assert.Equal(ExternalAiPolicy.Deny, source.InitialPolicy);
+        var foreign = new StoredObjectRef(new(Guid.NewGuid()), "object-fixture", EmptySha256, 0,
+            "application/octet-stream", SourceRightsClass.PrivateOperational);
+        Assert.Throws<ArgumentException>(() => new CaptureReceiptCommand(context, source.SourceId, 1,
+            "external-fixture", foreign, "1", "1"));
+        var own = new StoredObjectRef(Workspace, "object-fixture", EmptySha256, 0,
+            "application/octet-stream", SourceRightsClass.PrivateOperational);
+        var capture = new CaptureReceiptCommand(context, source.SourceId, 1, "external-fixture", own, "1", "1");
+        Assert.Equal("source-fixture-A", capture.SourceId);
+        Assert.Equal("external-fixture", capture.ExternalKey);
+    }
+
+    [Fact]
+    public void Document_import_rejects_foreign_object_without_inventing_missing_locality()
+    {
+        var context = new CommandContext(Workspace, "document-fixture", Guid.NewGuid(), "synthetic-owner");
+        var metadata = new EvidenceMetadata("synthetic", null, null, null, At, "pl", null,
+            [], [], [], [], null, [], null, null, [], PublicationState.Unknown, TagCoverage.Unknown, EmptySha256);
+        var foreign = new StoredObjectRef(new(Guid.NewGuid()), "object-fixture", EmptySha256, 0,
+            "application/pdf", SourceRightsClass.PrivateCopyright);
+        Assert.Throws<ArgumentException>(() => new ImportDocumentCommand(context, "doc-fixture", "source-fixture",
+            DocumentKind.Book, "synthetic", foreign, metadata));
+        Assert.Null(metadata.GeoContext);
+        Assert.Null(metadata.PublicationDateText);
     }
 }
