@@ -1,6 +1,10 @@
 <Project>
-  <!-- All future NuGet package versions are pinned here by Integration Owner in Wave 0. -->
+  <!-- Integration Owner pins all NuGet package versions here. -->
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="xunit.v3" Version="4.0.2" />
+    <PackageVersion Include="JsonSchema.Net" Version="9.6.0" />
+  </ItemGroup>
 </Project>

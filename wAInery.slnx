@@ -25,5 +25,6 @@
   </Folder>
   <Folder Name="/Tests/">
     <Project Path="tests/Architecture/wAInery.ArchitectureChecks.csproj" />
+    <Project Path="tests/Contracts/wAInery.Contracts.Tests.csproj" />
   </Folder>
 </Solution>

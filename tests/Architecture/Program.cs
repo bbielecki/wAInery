@@ -9,8 +9,16 @@ var projectPaths = solution.Descendants("Project")
     .Select(p => Path.GetFullPath(Path.Combine(root, p!)))
     .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-if (projectPaths.Count != 19)
-    throw new InvalidOperationException($"Expected 19 monorepo projects, found {projectPaths.Count}.");
+var moduleNames = new[] { "Vineyard", "Winery", "Decisions", "Observations", "Weather", "Knowledge", "Connectivity", "AIExecution" };
+var requiredPaths = new[] { "src/BuildingBlocks/wAInery.BuildingBlocks.csproj", "src/Host/wAInery.Host.csproj",
+    "tests/Architecture/wAInery.ArchitectureChecks.csproj" }.Concat(moduleNames.SelectMany(module => new[]
+    {
+        $"src/Modules/{module}/wAInery.Modules.{module}.csproj",
+        $"src/Modules/{module}/Contracts/wAInery.Modules.{module}.Contracts.csproj"
+    }));
+foreach (var required in requiredPaths)
+    if (!projectPaths.Contains(Path.GetFullPath(Path.Combine(root, required))))
+        throw new InvalidOperationException($"Required monorepo project missing from solution: {required}");
 
 var graph = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
 foreach (var project in projectPaths)
@@ -29,7 +37,7 @@ foreach (var project in projectPaths)
         if (sourceModule != null && targetModule != null && sourceModule != targetModule && !target.Contains(
             $"{Path.DirectorySeparatorChar}Contracts{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase))
             throw new Exception($"Illegal cross-module implementation reference: {project} -> {target}");
-        if (project.Contains($"{Path.DirectorySeparatorChar}Contracts{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase)
+        if (sourceModule is not null && project.Contains($"{Path.DirectorySeparatorChar}Contracts{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase)
             && targetModule != null)
             throw new Exception($"Public contract assembly depends on another module: {project} -> {target}");
         targets.Add(target);
