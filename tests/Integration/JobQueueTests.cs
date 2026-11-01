@@ -442,4 +442,130 @@ public sealed class JobQueueTests(PostgresFixture fixture) : IClassFixture<Postg
         }
         catch { await dataSource.DisposeAsync(); throw; }
     }
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Completion_or_failure_rechecks_expiry_after_waiting_for_a_row_lock(bool fail)
+    {
+        await using var dataSource = await PreparedDatabase();
+        var queue = new PostgresJobQueue(dataSource);
+        await Enqueue(dataSource, queue, Request(1));
+        var lease = await Claim(queue);
+        // Commit the short deadline BEFORE the blocker locks. Its transaction
+        // must not update the tuple: an UPDATE could mask the old bug via EPQ.
+        await ChangeTime(dataSource, lease.Id,
+            "UPDATE processing.jobs SET lease_until=clock_timestamp()+interval '5 seconds' WHERE id=@id");
+        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(Ct);
+        deadline.CancelAfter(TimeSpan.FromSeconds(15));
+        await using var blocker = await dataSource.OpenConnectionAsync(deadline.Token);
+        await using var blockerTransaction = await blocker.BeginTransactionAsync(deadline.Token);
+        Task<bool>? operation = null;
+        var released = false;
+        var observed = false;
+        try
+        {
+            await using var takeLock = new NpgsqlCommand(
+                "SELECT pg_backend_pid() FROM processing.jobs WHERE id=@id FOR UPDATE", blocker, blockerTransaction);
+            takeLock.Parameters.AddWithValue("id", lease.Id);
+            var blockerPid = (int)(await takeLock.ExecuteScalarAsync(deadline.Token)
+                ?? throw new InvalidOperationException("Synthetic job was not found."));
+            operation = fail
+                ? queue.FailAsync(lease, ProcessingFailure.HandlerFailure, deadline.Token)
+                : CompleteAfterLockWait(dataSource, queue, lease, deadline.Token);
+            await using var observer = await dataSource.OpenConnectionAsync(deadline.Token);
+            await ObserveLockWaitWhileLeaseValid(observer, blockerPid, lease.Id, operation, deadline.Token);
+            // Wait on the DB clock, capped at five seconds. The blocker only
+            // rolls back afterwards; no UPDATE forces predicate re-evaluation.
+            await using (var expire = new NpgsqlCommand("""
+                SELECT pg_sleep(LEAST(5.0,
+                  GREATEST(0.0,extract(epoch FROM (lease_until-clock_timestamp()))+0.05))::double precision)
+                FROM processing.jobs WHERE id=@id
+                """, observer) { CommandTimeout = 10 })
+            {
+                expire.Parameters.AddWithValue("id", lease.Id);
+                await expire.ExecuteNonQueryAsync(deadline.Token);
+            }
+            await using (var expired = new NpgsqlCommand(
+                "SELECT lease_until<=clock_timestamp() FROM processing.jobs WHERE id=@id", observer))
+            {
+                expired.Parameters.AddWithValue("id", lease.Id);
+                Assert.Equal(true, await expired.ExecuteScalarAsync(deadline.Token));
+            }
+            await blockerTransaction.RollbackAsync(deadline.Token);
+            released = true;
+            var accepted = await operation;
+            observed = true;
+            Assert.False(accepted);
+            Assert.Equal("RUNNING", (await State(dataSource)).Status);
+            Assert.Equal(0L, await Scalar<long>(dataSource, "SELECT count(*) FROM processing.job_fixture_publications"));
+        }
+        finally
+        {
+            try
+            {
+                if (!released)
+                {
+                    using var cleanup = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                    await blockerTransaction.RollbackAsync(cleanup.Token);
+                }
+            }
+            finally
+            {
+                deadline.Cancel();
+                if (operation is not null && !observed)
+                {
+                    try { await operation; }
+                    catch (Exception) when (deadline.IsCancellationRequested)
+                    {
+                        // A body/setup assertion already failed. Observe the
+                        // cancelled/faulted worker and preserve that failure.
+                    }
+                }
+            }
+        }
+    }
+
+    private static async Task ObserveLockWaitWhileLeaseValid(NpgsqlConnection observer, int blockerPid,
+        Guid jobId, Task<bool> operation, CancellationToken ct)
+    {
+        while (true)
+        {
+            ct.ThrowIfCancellationRequested();
+            await using var probe = new NpgsqlCommand("""
+                SELECT j.lease_until>clock_timestamp(), EXISTS(
+                  SELECT 1 FROM pg_stat_activity AS activity
+                  WHERE activity.datname=current_database() AND activity.wait_event_type='Lock'
+                    AND @blocker=ANY(pg_blocking_pids(activity.pid)))
+                FROM processing.jobs AS j WHERE j.id=@id
+                """, observer);
+            probe.Parameters.AddWithValue("blocker", blockerPid);
+            probe.Parameters.AddWithValue("id", jobId);
+            await using var reader = await probe.ExecuteReaderAsync(ct);
+            Assert.True(await reader.ReadAsync(ct));
+            Assert.True(reader.GetBoolean(0),
+                "Lease expired before a lock wait was observed; timing precondition was not established.");
+            if (reader.GetBoolean(1)) return;
+            Assert.False(operation.IsCompleted, "Worker finished before its row-lock wait was observed.");
+            await Task.Delay(TimeSpan.FromMilliseconds(25), ct);
+        }
+    }
+
+    private static async Task<bool> CompleteAfterLockWait(NpgsqlDataSource source, PostgresJobQueue queue,
+        JobLease lease, CancellationToken ct)
+    {
+        await using var connection = await source.OpenConnectionAsync(ct);
+        await using var transaction = await connection.BeginTransactionAsync(ct);
+        var accepted = await queue.CompleteAsync(connection, transaction, lease, ct);
+        if (accepted)
+        {
+            await using var publish = new NpgsqlCommand(
+                "INSERT INTO processing.job_fixture_publications(job_id,revision) VALUES (@id,@revision)", connection, transaction);
+            publish.Parameters.AddWithValue("id", lease.Id);
+            publish.Parameters.AddWithValue("revision", lease.Revision);
+            await publish.ExecuteNonQueryAsync(ct);
+        }
+        await transaction.CommitAsync(ct);
+        return accepted;
+    }
+
 }
