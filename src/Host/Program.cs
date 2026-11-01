@@ -37,6 +37,8 @@ try
     var builder = WebApplication.CreateBuilder(args);
     // Kestrel:Endpoints overrides UseUrls; reject that separate configuration path.
     if (builder.Configuration.GetSection("Kestrel:Endpoints").Exists()) throw new InvalidOperationException();
+    builder.WebHost.ConfigureKestrel((context, options) =>
+        options.Configure(context.Configuration.GetSection("Kestrel"), reloadOnChange: false));
     builder.WebHost.UseUrls(listen.AbsoluteUri);
     builder.Services.AddSingleton(_ => NpgsqlDataSource.Create(connectionString));
     builder.Services.AddSingleton<MigrationCompatibilityProbe>();

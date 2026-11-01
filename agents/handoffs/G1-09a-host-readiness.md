@@ -44,6 +44,17 @@ git diff --check
 Fresh-main final tests, independent qa_g1_01 review (not C or IO) and CI pending
 before squash. No owner handlers, weather, RAG, AI, plan evaluation or domain
 operation E2E executed; not Gate1 claims. No privacy/rights/economic policy change.
-No new transferable finding beyond canonical live/readiness separation; verified
-blackbox behavior stays in regression tests. Existing verification skill reused.
+Independent review found startup-only endpoint guard can be bypassed by default
+Kestrel endpoint reload. New owned temp contentRoot test changed its own JSON after
+startup, adding only a second LOOPBACK endpoint (no public exposure during RED).
+Actual single-case RED: unapproved listener answered health HTTP200, not a timeout.
+Explicit Configure(KestrelSection,reloadOnChange:false) disables this path while
+preserving startupreject. Regression observes8s and then verifies original ready.
+Single-case GREEN after fix, actual1PASS. P2 added actual SQL exception coverage:
+own disposable journal temporarily renamed, view/function raises synthetic private
+marker; ready503/live200 then restore→ready200, marker/password/connection/function
+absent from response/logs. Actual filtered1PASS; source catch already correct.
+Now15Host cases, final173/full rerun/review pending. Transferable lesson candidate: one-time configuration
+validation is insufficient if framework reload can change the validated resource.
+Existing verification skill reused. No new skill; deterministic regression is better.
 Final demo/learning/admin prerequisite/human Gate1 review remains issue34.

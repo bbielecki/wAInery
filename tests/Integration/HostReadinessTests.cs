@@ -142,11 +142,116 @@ public sealed class HostReadinessTests(PostgresFixture fixture) : IClassFixture<
         }
     }
 
+    [Fact]
+    public async Task Runtime_database_exception_is_private_and_readiness_recovers()
+    {
+        var connectionString = await MigratedDatabase();
+        var password = Password(connectionString);
+        var host = OwnedHost.Start(CreateStart(connectionString));
+        try
+        {
+            var startup = await host.WaitForStartup(Ct);
+            Assert.True(startup.Listening);
+            await host.WaitUntilApplicationStarted(Ct);
+            using var http = NewClient(AssertLoopback(host, startup.Address));
+            await AssertHealth(http, "/health/ready", HttpStatusCode.OK, connectionString, password);
+            await using var connection = new NpgsqlConnection(connectionString);
+            await connection.OpenAsync(Ct);
+            await using (var failure = new NpgsqlCommand("""
+                ALTER TABLE processing.schema_migrations RENAME TO fixture_journal;
+                CREATE FUNCTION processing.fixture_probe_failure() RETURNS integer LANGUAGE plpgsql AS
+                    $$ BEGIN RAISE EXCEPTION 'SYNTHETIC_HOST_PRIVATE_MARKER'; END $$;
+                CREATE VIEW processing.schema_migrations AS
+                    SELECT processing.fixture_probe_failure() AS version, ''::text AS name, ''::text AS checksum;
+                """, connection)) await failure.ExecuteNonQueryAsync(Ct);
+            await AssertHealth(http, "/health/ready", HttpStatusCode.ServiceUnavailable, connectionString, password);
+            await AssertHealth(http, "/health/live", HttpStatusCode.OK, connectionString, password);
+            await using (var repair = new NpgsqlCommand("""
+                DROP VIEW processing.schema_migrations;
+                DROP FUNCTION processing.fixture_probe_failure();
+                ALTER TABLE processing.fixture_journal RENAME TO schema_migrations;
+                """, connection)) await repair.ExecuteNonQueryAsync(Ct);
+            await AssertHealth(http, "/health/ready", HttpStatusCode.OK, connectionString, password);
+        }
+        finally
+        {
+            await host.DisposeAsync();
+            AssertSafe(host.CapturedText, connectionString, password);
+            Assert.False(host.CapturedText.Contains("fixture_probe_failure", StringComparison.Ordinal));
+        }
+    }
+
     private async Task<string> MigratedDatabase()
     {
         var connectionString = await fixture.CreateDatabaseAsync(Ct);
         await new MigrationRunner().ApplyAsync(connectionString, Ct);
         return connectionString;
+    }
+
+    [Fact]
+    public async Task Changed_endpoint_file_after_startup_cannot_add_a_listener()
+    {
+        var connectionString = await MigratedDatabase();
+        var ownedRoot = Directory.CreateTempSubdirectory("wainery-host-reload-");
+        try
+        {
+            var configPath = Path.Combine(ownedRoot.FullName, "appsettings.json");
+            await File.WriteAllTextAsync(configPath, "{}", Ct);
+            var start = CreateStart(connectionString);
+            start.ArgumentList.Add("--contentRoot");
+            start.ArgumentList.Add(ownedRoot.FullName);
+            var host = OwnedHost.Start(start);
+            try
+            {
+                var startup = await host.WaitForStartup(Ct);
+                Assert.True(startup.Listening);
+                await host.WaitUntilApplicationStarted(Ct);
+                using var original = NewClient(AssertLoopback(host, startup.Address));
+                await AssertHealth(original, "/health/ready", HttpStatusCode.OK, connectionString, Password(connectionString));
+                // Prove a reload bypass safely with a second LOOPBACK address;
+                // never publish a public listener, even during the initial RED.
+                var reservation = new System.Net.Sockets.TcpListener(IPAddress.Loopback, 0);
+                reservation.Start();
+                var port = ((IPEndPoint)reservation.LocalEndpoint).Port;
+                reservation.Stop();
+                var extra = new Uri($"http://127.0.0.1:{port}");
+                var changed = System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    Kestrel = new { Endpoints = new { LateOverride = new { Url = extra.AbsoluteUri } } }
+                });
+                await File.WriteAllTextAsync(configPath, changed, Ct);
+                using var unexpected = NewClient(extra);
+                var window = Stopwatch.StartNew();
+                var bound = false;
+                while (window.Elapsed < TimeSpan.FromSeconds(8))
+                {
+                    try
+                    {
+                        using var response = await unexpected.GetAsync("/health/live", Ct);
+                        bound = response.StatusCode == HttpStatusCode.OK;
+                        if (bound) break;
+                    }
+                    catch (HttpRequestException) { }
+                    await Task.Delay(100, Ct);
+                }
+                Assert.False(bound, "Changed endpoint file added an unapproved listener after startup.");
+                await AssertHealth(original, "/health/ready", HttpStatusCode.OK, connectionString, Password(connectionString));
+            }
+            finally
+            {
+                await host.DisposeAsync();
+                AssertSafe(host.CapturedText, connectionString, Password(connectionString));
+            }
+        }
+        finally
+        {
+            var temp = Path.GetFullPath(Path.GetTempPath()).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+            if (!ownedRoot.FullName.StartsWith(temp, StringComparison.OrdinalIgnoreCase)
+                || !ownedRoot.Name.StartsWith("wainery-host-reload-", StringComparison.Ordinal)
+                || (ownedRoot.Attributes & FileAttributes.ReparsePoint) != 0)
+                throw new InvalidOperationException("Owned test directory cleanup boundary changed.");
+            ownedRoot.Delete(recursive: true);
+        }
     }
 
     private static async Task SetJournal(string connectionString, bool valid)
